@@ -3,6 +3,7 @@ const API_BASE_URL =
   (import.meta.env.PROD ? "" : "http://localhost:8000");
 
 const UNSAFE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+let csrfTokenOverride: string | null = null;
 
 export type ApiError = {
   status: number;
@@ -19,6 +20,10 @@ function readCookie(name: string): string | null {
     }
   }
   return null;
+}
+
+export function setCsrfToken(token: string | null) {
+  csrfTokenOverride = token && token.trim() ? token : null;
 }
 
 function buildUrl(path: string): string {
@@ -64,7 +69,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
 
   if (UNSAFE_METHODS.has(method)) {
-    const csrfToken = readCookie("csrftoken");
+    const csrfToken = csrfTokenOverride ?? readCookie("csrftoken");
     if (csrfToken) {
       headers.set("X-CSRFToken", csrfToken);
     }

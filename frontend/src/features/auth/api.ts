@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from "../../lib/api";
+import { apiGet, apiPost, setCsrfToken } from "../../lib/api";
 
 export type AuthUser = {
   id: number;
@@ -19,7 +19,10 @@ export type LogoutResponse = {
 };
 
 export function getCsrf(): Promise<CsrfResponse> {
-  return apiGet<CsrfResponse>("/api/auth/csrf/");
+  return apiGet<CsrfResponse>("/api/auth/csrf/").then((response) => {
+    setCsrfToken(response.csrfToken);
+    return response;
+  });
 }
 
 export function login(username: string, password: string): Promise<AuthUser> {
@@ -31,5 +34,7 @@ export function me(): Promise<AuthUser> {
 }
 
 export function logout(): Promise<LogoutResponse> {
-  return apiPost<LogoutResponse>("/api/auth/logout/");
+  return apiPost<LogoutResponse>("/api/auth/logout/").finally(() => {
+    setCsrfToken(null);
+  });
 }

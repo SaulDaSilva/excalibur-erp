@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import environ
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # backend/
 AUTH_USER_MODEL = "users.User"
@@ -23,10 +24,13 @@ else:
 if env_file_path.exists():
     environ.Env.read_env(env_file_path)
 
-SECRET_KEY = env("DJANGO_SECRET_KEY")
+SECRET_KEY = env("DJANGO_SECRET_KEY", default=os.environ.get("SECRET_KEY"))
 DEBUG = env("DJANGO_DEBUG")
 
 ALLOWED_HOSTS = [h.strip() for h in env("DJANGO_ALLOWED_HOSTS", default="").split(",") if h.strip()]
+render_external_hostname = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if render_external_hostname and render_external_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_external_hostname)
 ENABLE_ADMIN = env.bool("DJANGO_ENABLE_ADMIN", default=True)
 ADMIN_URL_PATH = env("DJANGO_ADMIN_URL", default="admin/").strip().lstrip("/") or "admin/"
 if ADMIN_URL_PATH and not ADMIN_URL_PATH.endswith("/"):
@@ -59,6 +63,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",  # must be high
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -87,18 +92,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("DB_NAME"),
-        "USER": env("DB_USER"),
-        "PASSWORD": env("DB_PASSWORD"),
-        "HOST": env("DB_HOST"),
-        "PORT": env("DB_PORT"),
-        "CONN_MAX_AGE": 0,
-        "OPTIONS": {"connect_timeout": 5},
+db_conn_max_age = env.int("DB_CONN_MAX_AGE", default=0)
+database_url = env("DATABASE_URL", default="")
+
+if database_url:
+    DATABASES = {
+        "default": dj_database_url.parse(
+            database_url,
+            conn_max_age=db_conn_max_age,
+        )
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": env("DB_NAME"),
+            "USER": env("DB_USER"),
+            "PASSWORD": env("DB_PASSWORD"),
+            "HOST": env("DB_HOST"),
+            "PORT": env("DB_PORT"),
+            "CONN_MAX_AGE": db_conn_max_age,
+            "OPTIONS": {"connect_timeout": 5},
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -112,7 +128,7 @@ TIME_ZONE = "America/Guayaquil"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # DRF: session auth + locked down by default

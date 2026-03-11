@@ -9,7 +9,6 @@ from django.db.models.functions import Coalesce
 from django.utils import timezone
 
 from apps.catalogo.models import ProductVariant
-from apps.inventario.models import InventoryMovement
 from apps.pedidos.models import Order, OrderItem
 
 
@@ -34,14 +33,15 @@ def get_dashboard_summary(low_stock_threshold: int = 10) -> dict[str, Any]:
     ]
 
     sales_last_7_days_usd = _get_sales_last_7_days_usd()
-    current_stock_pairs = _get_current_stock_pairs()
+    pairs_last_7_days = _get_pairs_last_7_days()
     low_stock_variants_count = _get_low_stock_variants_count(low_stock_threshold)
 
     return {
         "metrics": {
             "pending_orders_count": pending_orders_count,
             "sales_last_7_days_usd": sales_last_7_days_usd,
-            "current_stock_pairs": current_stock_pairs,
+            "sold_pairs_last_7_days": pairs_last_7_days["sold_pairs_last_7_days"],
+            "promo_pairs_last_7_days": pairs_last_7_days["promo_pairs_last_7_days"],
             "low_stock_variants_count": low_stock_variants_count,
             "low_stock_threshold": low_stock_threshold,
         },
@@ -70,14 +70,31 @@ def _get_sales_last_7_days_usd() -> Decimal:
         .get("total", Decimal("0.00"))
     )
     return total or Decimal("0.00")
-
-
-def _get_current_stock_pairs() -> int:
-    total = (
-        InventoryMovement.objects.aggregate(total=Coalesce(Sum("quantity_pairs"), 0))
-        .get("total", 0)
+def _get_pairs_last_7_days() -> dict[str, int]:
+    cutoff = timezone.now() - timedelta(days=7)
+    aggregated = (
+        OrderItem.objects.filter(
+            order__status=Order.Status.DISPATCHED,
+            order__created_at__gte=cutoff,
+        )
+        .values("kind")
+        .annotate(total_pairs=Coalesce(Sum("quantity_pairs"), 0))
     )
-    return int(total or 0)
+
+    sold_pairs = 0
+    promo_pairs = 0
+
+    for row in aggregated:
+        total_pairs = int(row.get("total_pairs") or 0)
+        if row["kind"] == OrderItem.Kind.SALE:
+            sold_pairs = total_pairs
+        elif row["kind"] == OrderItem.Kind.PROMO:
+            promo_pairs = total_pairs
+
+    return {
+        "sold_pairs_last_7_days": sold_pairs,
+        "promo_pairs_last_7_days": promo_pairs,
+    }
 
 
 def _get_low_stock_variants_count(low_stock_threshold: int) -> int:

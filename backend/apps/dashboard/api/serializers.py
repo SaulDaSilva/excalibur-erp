@@ -8,7 +8,8 @@ class DashboardSummaryQuerySerializer(serializers.Serializer):
 class DashboardMetricsSerializer(serializers.Serializer):
     pending_orders_count = serializers.IntegerField()
     sales_last_7_days_usd = serializers.DecimalField(max_digits=18, decimal_places=2)
-    current_stock_pairs = serializers.IntegerField()
+    sold_pairs_last_7_days = serializers.IntegerField()
+    promo_pairs_last_7_days = serializers.IntegerField()
     low_stock_variants_count = serializers.IntegerField()
     low_stock_threshold = serializers.IntegerField()
 

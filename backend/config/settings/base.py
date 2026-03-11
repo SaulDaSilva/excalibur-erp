@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # backend/
@@ -7,12 +8,29 @@ env = environ.Env(
     DJANGO_DEBUG=(bool, False),
 )
 
-environ.Env.read_env(BASE_DIR / ".env")
+settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "")
+env_file_name = os.environ.get("DJANGO_ENV_FILE")
+
+if env_file_name:
+    env_file_path = Path(env_file_name)
+    if not env_file_path.is_absolute():
+        env_file_path = BASE_DIR / env_file_path
+elif settings_module.endswith(".prod") and (BASE_DIR / ".env.prod").exists():
+    env_file_path = BASE_DIR / ".env.prod"
+else:
+    env_file_path = BASE_DIR / ".env"
+
+if env_file_path.exists():
+    environ.Env.read_env(env_file_path)
 
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env("DJANGO_DEBUG")
 
 ALLOWED_HOSTS = [h.strip() for h in env("DJANGO_ALLOWED_HOSTS", default="").split(",") if h.strip()]
+ENABLE_ADMIN = env.bool("DJANGO_ENABLE_ADMIN", default=True)
+ADMIN_URL_PATH = env("DJANGO_ADMIN_URL", default="admin/").strip().lstrip("/") or "admin/"
+if ADMIN_URL_PATH and not ADMIN_URL_PATH.endswith("/"):
+    ADMIN_URL_PATH = f"{ADMIN_URL_PATH}/"
 
 INSTALLED_APPS = [
     # Django
@@ -105,6 +123,9 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_THROTTLE_RATES": {
+        "login": env("DRF_LOGIN_THROTTLE_RATE", default="5/min"),
+    },
 }
 
 # CORS / CSRF for Vite dev server
@@ -114,5 +135,17 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in env("CSRF_TRUSTED_ORIGINS", default="").split(",") if o.strip()]
 
 # Cookie posture for internal app (localhost dev ok)
-SESSION_COOKIE_SAMESITE = "Lax"
-CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = env("DJANGO_SESSION_COOKIE_SAMESITE", default="Lax")
+CSRF_COOKIE_SAMESITE = env("DJANGO_CSRF_COOKIE_SAMESITE", default="Lax")
+SESSION_COOKIE_HTTPONLY = True
+
+# The SPA reads csrftoken from the cookie to send X-CSRFToken on unsafe requests.
+CSRF_COOKIE_HTTPONLY = False
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+SECURE_REFERRER_POLICY = env("DJANGO_SECURE_REFERRER_POLICY", default="strict-origin-when-cross-origin")
+SECURE_CROSS_ORIGIN_OPENER_POLICY = env(
+    "DJANGO_SECURE_CROSS_ORIGIN_OPENER_POLICY",
+    default="same-origin",
+)

@@ -23,6 +23,7 @@ export type Cliente = {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  notes?: string;
 };
 
 export type Direccion = {
@@ -58,4 +59,48 @@ export type ClienteUpdateInput = {
   email: string;
   phone: string;
   country: number;
+};
+
+export type DireccionDraft = {
+  id?: number;
+  province: string;
+  city: string;
+  address_line: string;
+  is_primary: boolean;
+};
+
+export type DireccionCreateInput = {
+  customer: number;
+  province: string;
+  city: string;
+  address_line: string;
+  is_primary: boolean;
+};
+
+export type DireccionUpdateInput = {
+  province: string;
+  city: string;
+  address_line: string;
+  is_primary: boolean;
+};
+
+export type ClienteFormSubmitPayload = {
+  customer: ClienteCreateInput | ClienteUpdateInput;
+  addresses: DireccionDraft[];
+};
+
+export type ClienteFieldName =
+  | "first_name"
+  | "last_name"
+  | "id_number"
+  | "email"
+  | "phone"
+  | "country";
+
+export type DireccionFieldName = "province" | "city" | "address_line" | "is_primary";
+
+export type ClienteFormSubmissionError = {
+  detail?: string;
+  customerFieldErrors?: Partial<Record<ClienteFieldName, string>>;
+  addressFieldErrors?: Record<number, Partial<Record<DireccionFieldName, string>>>;
 };

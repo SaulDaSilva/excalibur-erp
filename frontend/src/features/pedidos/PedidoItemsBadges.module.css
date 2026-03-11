@@ -1,0 +1,23 @@
+.list {
+  @apply flex flex-wrap items-center justify-center gap-2 text-center;
+}
+
+.stacked {
+  @apply flex-col items-center justify-center;
+}
+
+.badge {
+  @apply inline-flex min-h-[2rem] items-center justify-center rounded-full border px-2.5 py-1 text-center text-xs font-medium leading-tight;
+}
+
+.sale {
+  @apply border-slate-200 bg-slate-100 text-slate-700;
+}
+
+.promo {
+  @apply border-amber-200 bg-amber-50 text-amber-700;
+}
+
+.more {
+  @apply border-slate-200 bg-white text-slate-500;
+}

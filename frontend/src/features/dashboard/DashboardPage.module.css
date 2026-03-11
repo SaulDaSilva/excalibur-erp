@@ -1,0 +1,11 @@
+.section {
+  @apply space-y-4;
+}
+
+.errorText {
+  @apply text-sm text-rose-700;
+}
+
+.topGrid {
+  @apply grid gap-3 lg:grid-cols-5;
+}

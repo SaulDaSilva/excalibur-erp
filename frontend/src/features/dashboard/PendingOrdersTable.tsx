@@ -2,8 +2,10 @@ import { Link } from "react-router-dom";
 
 import { Card } from "../../components/ui/Card";
 import { TableCard } from "../../components/ui/TableCard";
-import { formatCurrencyUSD, formatDateTime, itemsSummary } from "./formatters";
+import { PedidoItemsBadges } from "../pedidos/PedidoItemsBadges";
+import { formatCurrencyUSD, formatDateTime } from "./formatters";
 import type { PendingOrder } from "./types";
+import styles from "./PendingOrdersTable.module.css";
 
 function getChannelLabel(channel: PendingOrder["channel"]): string {
   if (channel === "WHATSAPP") {
@@ -24,58 +26,57 @@ export function PendingOrdersTable({ orders, loading = false }: PendingOrdersTab
   if (loading) {
     return (
       <Card>
-        <h2 className="text-lg font-semibold text-slate-900">Pedidos pendientes</h2>
-        <p className="mt-3 text-sm text-slate-600">Cargando...</p>
+        <h2 className={styles.loadingTitle}>Pedidos pendientes</h2>
+        <p className={styles.loadingText}>Cargando...</p>
       </Card>
     );
   }
 
   return (
-    <Card className="p-0">
-      <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 md:px-5">
-        <h2 className="text-lg font-semibold text-slate-900">Pedidos pendientes</h2>
+    <Card className={styles.card}>
+      <div className={styles.header}>
+        <h2 className={styles.title}>Pedidos pendientes</h2>
       </div>
 
-      <TableCard className="rounded-none border-0 shadow-none" scrollAreaClassName="h-[28rem]">
-        <table className="min-w-full text-sm">
-          <thead className="sticky top-0 z-10 bg-slate-50 text-left text-slate-600">
+      <TableCard className={styles.tableCard} scrollAreaClassName={styles.scrollArea}>
+        <table className={styles.table}>
+          <thead className={styles.head}>
             <tr>
-              <th className="px-4 py-3 font-medium md:px-5">Pedido</th>
-              <th className="px-4 py-3 font-medium md:px-5">Cliente</th>
-              <th className="px-4 py-3 font-medium md:px-5">Fecha</th>
-              <th className="px-4 py-3 font-medium md:px-5">Canal</th>
-              <th className="px-4 py-3 font-medium md:px-5">Items</th>
-              <th className="px-4 py-3 font-medium md:px-5">Total venta</th>
-              <th className="px-4 py-3 font-medium text-right md:px-5">Acciones</th>
+              <th className={styles.cell}>Pedido</th>
+              <th className={styles.cell}>Cliente</th>
+              <th className={styles.cell}>Fecha</th>
+              <th className={styles.cell}>Canal</th>
+              <th className={styles.cell}>Items</th>
+              <th className={styles.cell}>Total venta</th>
+              <th className={styles.cellRight}>Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200">
+          <tbody className={styles.body}>
             {orders.length === 0 && (
               <tr>
-                <td className="px-4 py-4 text-slate-500 md:px-5" colSpan={7}>
+                <td className={styles.empty} colSpan={7}>
                   No hay pedidos pendientes.
                 </td>
               </tr>
             )}
             {orders.map((order) => (
-              <tr key={order.id} className="hover:bg-slate-50">
-                <td className="px-4 py-3 md:px-5">#{order.id}</td>
-                <td className="px-4 py-3 md:px-5">
-                  <p className="font-medium text-slate-900">
+              <tr key={order.id} className={styles.row}>
+                <td className={styles.bodyCell}>#{order.id}</td>
+                <td className={styles.bodyCell}>
+                  <p className={styles.customerName}>
                     {order.customer.first_name} {order.customer.last_name}
                   </p>
-                  <p className="text-xs text-slate-500">{order.customer.id_number}</p>
+                  <p className={styles.customerMeta}>{order.customer.id_number}</p>
                 </td>
-                <td className="px-4 py-3 md:px-5">{formatDateTime(order.created_at)}</td>
-                <td className="px-4 py-3 md:px-5">{getChannelLabel(order.channel)}</td>
-                <td className="px-4 py-3 md:px-5 text-slate-700">{itemsSummary(order.items)}</td>
-                <td className="px-4 py-3 md:px-5">{formatCurrencyUSD(order.sold_amount_usd)}</td>
-                <td className="px-4 py-3 text-right md:px-5">
-                  <Link
-                    className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 shadow-sm hover:bg-slate-50"
-                    to="/pedidos"
-                  >
-                    Ver en Pedidos
+                <td className={styles.bodyCell}>{formatDateTime(order.created_at)}</td>
+                <td className={styles.bodyCell}>{getChannelLabel(order.channel)}</td>
+                <td className={styles.summaryCell}>
+                  <PedidoItemsBadges items={order.items} maxVisible={3} stacked />
+                </td>
+                <td className={styles.bodyCell}>{formatCurrencyUSD(order.sold_amount_usd)}</td>
+                <td className={styles.actionCell}>
+                  <Link className={styles.actionLink} to={`/pedidos/${order.id}`}>
+                    Ver detalle
                   </Link>
                 </td>
               </tr>

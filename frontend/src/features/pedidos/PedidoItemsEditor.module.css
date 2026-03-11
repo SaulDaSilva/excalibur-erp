@@ -1,0 +1,43 @@
+.section {
+  @apply space-y-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4;
+}
+
+.header {
+  @apply flex items-center justify-between gap-3;
+}
+
+.title {
+  @apply text-sm font-semibold text-slate-900;
+}
+
+.subtitle {
+  @apply text-sm text-slate-600;
+}
+
+.list {
+  @apply space-y-3;
+}
+
+.itemCard {
+  @apply rounded-xl border border-slate-200 bg-white p-4;
+}
+
+.itemGrid {
+  @apply grid gap-4 md:grid-cols-2 xl:grid-cols-4;
+}
+
+.field {
+  @apply flex flex-col gap-2;
+}
+
+.fieldActions {
+  @apply flex items-end;
+}
+
+.itemHeader {
+  @apply mb-3 flex items-center justify-between gap-3;
+}
+
+.itemTitle {
+  @apply text-sm font-medium text-slate-900;
+}

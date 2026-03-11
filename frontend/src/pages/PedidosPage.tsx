@@ -1,35 +1,34 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "../components/ui/Button";
-import { Card } from "../components/ui/Card";
+import { FilterPanel } from "../components/ui/FilterPanel";
+import { Notice } from "../components/ui/Notice";
 import { PaginationControls } from "../components/ui/PaginationControls";
 import { PageHeader } from "../components/ui/PageHeader";
 import { toApiError } from "../lib/api";
-import { PedidoFormModal } from "../features/pedidos/PedidoFormModal";
 import { PedidosTable } from "../features/pedidos/PedidosTable";
 import {
   useCancelPedido,
-  useCreatePedido,
   useDeletePedido,
   useDispatchPedido,
   usePedidos,
 } from "../features/pedidos/hooks";
-import type { OrderCreatePayload, Pedido, PedidoStatus } from "../features/pedidos/types";
+import type { Pedido, PedidoStatus } from "../features/pedidos/types";
 
 const PAGE_SIZE = 10;
 
 export function PedidosPage() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"" | PedidoStatus>("");
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [pageError, setPageError] = useState("");
 
   const pedidosQuery = usePedidos({ page, pageSize: PAGE_SIZE, q, status, customerId, from, to });
-  const createPedido = useCreatePedido();
   const dispatchPedido = useDispatchPedido();
   const cancelPedido = useCancelPedido();
   const deletePedido = useDeletePedido();
@@ -42,10 +41,6 @@ export function PedidosPage() {
   useEffect(() => {
     setPage(1);
   }, [q, status, customerId, from, to]);
-
-  const handleCreate = async (payload: OrderCreatePayload) => {
-    await createPedido.mutateAsync(payload);
-  };
 
   const handleDispatch = async (pedido: Pedido) => {
     if (!window.confirm(`Despachar pedido #${pedido.id}?`)) {
@@ -87,14 +82,17 @@ export function PedidosPage() {
     <section className="space-y-4">
       <PageHeader
         actions={
-          <Button type="button" variant="primary" onClick={() => setIsModalOpen(true)}>
+          <Button type="button" variant="primary" onClick={() => navigate("/pedidos/nuevo")}>
             Nuevo pedido
           </Button>
         }
       />
 
-      <Card>
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
+      <FilterPanel
+        title="Filtros"
+        subtitle="Filtra pedidos por texto, estado, cliente o rango de fechas."
+        gridClassName="xl:grid-cols-5"
+      >
           <input placeholder="Buscar..." value={q} onChange={(event) => setQ(event.target.value)} />
           <select value={status} onChange={(event) => setStatus(event.target.value as "" | PedidoStatus)}>
             <option value="">Todos los estados</option>
@@ -110,21 +108,19 @@ export function PedidosPage() {
           />
           <input type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
           <input type="date" value={to} onChange={(event) => setTo(event.target.value)} />
-        </div>
-      </Card>
+      </FilterPanel>
 
-      {pedidosQuery.isLoading && <p className="text-sm text-slate-600">Cargando...</p>}
+      {pedidosQuery.isLoading && <Notice variant="info" message="Cargando..." />}
       {pedidosQuery.isError && (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-          {toApiError(pedidosQuery.error).detail}
-        </p>
+        <Notice variant="error" message={toApiError(pedidosQuery.error).detail} />
       )}
-      {pageError && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{pageError}</p>}
+      {pageError && <Notice variant="error" message={pageError} />}
 
       {pedidosQuery.data && (
         <>
           <PedidosTable
             data={pedidosQuery.data.results}
+            onView={(pedido) => navigate(`/pedidos/${pedido.id}`)}
             onDispatch={handleDispatch}
             onCancel={handleCancel}
             onDelete={handleDelete}
@@ -132,8 +128,6 @@ export function PedidosPage() {
           <PaginationControls page={page} totalPages={totalPages} onPageChange={setPage} />
         </>
       )}
-
-      <PedidoFormModal open={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleCreate} />
     </section>
   );
 }

@@ -1,52 +1,46 @@
-import { useState } from "react";
-
 import { Card } from "../components/ui/Card";
+import { Notice } from "../components/ui/Notice";
 import { PageHeader } from "../components/ui/PageHeader";
 import { MetricCards } from "../features/dashboard/MetricCards";
 import { PendingOrdersTable } from "../features/dashboard/PendingOrdersTable";
+import { StockByVariantCard } from "../features/dashboard/StockByVariantCard";
 import { formatDateTime } from "../features/dashboard/formatters";
-import { useDashboardSummary } from "../features/dashboard/hooks";
+import { useDashboardStockByVariant, useDashboardSummary } from "../features/dashboard/hooks";
+import styles from "../features/dashboard/DashboardPage.module.css";
 import { toApiError } from "../lib/api";
 
 export function DashboardPage() {
-  const [lowStockThreshold, setLowStockThreshold] = useState(10);
-  const summaryQuery = useDashboardSummary(lowStockThreshold);
+  const summaryQuery = useDashboardSummary();
+  const stockByVariantQuery = useDashboardStockByVariant(10);
 
   return (
-    <section className="space-y-4">
+    <section className={styles.section}>
       <PageHeader
         subtitle={
           summaryQuery.data?.generated_at
             ? `Actualizado: ${formatDateTime(summaryQuery.data.generated_at)}`
             : undefined
         }
-        actions={
-          <label className="flex items-center gap-2 text-sm text-slate-600">
-            Umbral de stock bajo
-            <input
-              className="w-20"
-              min={0}
-              step={1}
-              type="number"
-              value={lowStockThreshold}
-              onChange={(event) => {
-                const value = Number(event.target.value);
-                setLowStockThreshold(Number.isNaN(value) ? 10 : value);
-              }}
-            />
-          </label>
-        }
       />
 
       {summaryQuery.isError && (
         <Card>
-          <p className="text-sm text-rose-700">{toApiError(summaryQuery.error).detail}</p>
+          <Notice variant="error" message={toApiError(summaryQuery.error).detail} className={styles.errorText} />
+        </Card>
+      )}
+
+      {stockByVariantQuery.isError && (
+        <Card>
+          <Notice variant="error" message={toApiError(stockByVariantQuery.error).detail} className={styles.errorText} />
         </Card>
       )}
 
       {!summaryQuery.isError && (
         <>
-          <MetricCards loading={summaryQuery.isLoading} metrics={summaryQuery.data?.metrics} />
+          <div className={styles.topGrid}>
+            <MetricCards loading={summaryQuery.isLoading} metrics={summaryQuery.data?.metrics} />
+            <StockByVariantCard loading={stockByVariantQuery.isLoading} rows={stockByVariantQuery.data} />
+          </div>
           <PendingOrdersTable loading={summaryQuery.isLoading} orders={summaryQuery.data?.pending_orders ?? []} />
         </>
       )}

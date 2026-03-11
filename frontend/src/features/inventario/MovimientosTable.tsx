@@ -1,4 +1,5 @@
-import { Card } from "../../components/ui/Card";
+import styles from "../../components/ui/DataTable.module.css";
+import { Notice } from "../../components/ui/Notice";
 import { PaginationControls } from "../../components/ui/PaginationControls";
 import { TableCard } from "../../components/ui/TableCard";
 import type { PaginatedResponse } from "../clientes/types";
@@ -30,38 +31,36 @@ export function MovimientosTable({ data, page, pageSize, onPageChange, loading }
 
   return (
     <section className="space-y-3">
-      <h3 className="text-base font-semibold text-slate-900">Movimientos</h3>
-      {loading && <p>Cargando...</p>}
-      {!loading && rows.length === 0 && (
-        <Card>
-          <p className="text-sm text-slate-600">No se encontraron movimientos.</p>
-        </Card>
-      )}
+      {loading && <Notice variant="info" message="Cargando..." />}
+      {!loading && rows.length === 0 && <Notice variant="empty" message="No se encontraron movimientos." />}
 
       {rows.length > 0 && (
         <TableCard>
-          <table className="min-w-full divide-y divide-slate-200 text-sm">
-            <thead className="sticky top-0 z-10 bg-slate-50 text-slate-600">
+          <table className={styles.table}>
+            <thead className={styles.head}>
               <tr>
-                <th className="px-4 py-3 text-left font-medium">Fecha</th>
-                <th className="px-4 py-3 text-left font-medium">Tipo</th>
-                <th className="px-4 py-3 text-left font-medium">Cantidad</th>
-                <th className="px-4 py-3 text-left font-medium">Variante</th>
-                <th className="px-4 py-3 text-left font-medium">Pedido</th>
-                <th className="px-4 py-3 text-left font-medium">Nota</th>
+                <th className={styles.th}>Fecha</th>
+                <th className={styles.th}>Tipo</th>
+                <th className={styles.th}>Cantidad</th>
+                <th className={styles.th}>Variante</th>
+                <th className={styles.th}>Pedido</th>
+                <th className={styles.th}>Nota</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 bg-white text-slate-700">
+            <tbody className={styles.body}>
               {rows.map((row) => (
-                <tr key={row.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3">{new Date(row.created_at).toLocaleString()}</td>
-                  <td className="px-4 py-3">{getMovementTypeLabel(row.movement_type)}</td>
-                  <td className="px-4 py-3">{row.quantity_pairs}</td>
-                  <td className="px-4 py-3">
-                    {row.product_variant.product} - {row.product_variant.measure_mm}mm
+                <tr key={row.id} className={styles.row}>
+                  <td className={styles.td}>{new Date(row.created_at).toLocaleString()}</td>
+                  <td className={styles.td}>{getMovementTypeLabel(row.movement_type)}</td>
+                  <td className={styles.td}>{row.quantity_pairs}</td>
+                  <td className={styles.td}>
+                    <div className={styles.cellStack}>
+                      <p className={styles.primaryText}>{row.product_variant.product}</p>
+                      <p className={styles.secondaryText}>{row.product_variant.measure_mm}mm</p>
+                    </div>
                   </td>
-                  <td className="px-4 py-3">{row.order ?? "-"}</td>
-                  <td className="px-4 py-3">{row.note || "-"}</td>
+                  <td className={styles.td}>{row.order ?? "-"}</td>
+                  <td className={styles.td}>{row.note || "-"}</td>
                 </tr>
               ))}
             </tbody>

@@ -1,5 +1,6 @@
 import { Button } from "../../components/ui/Button";
-import { Card } from "../../components/ui/Card";
+import styles from "../../components/ui/DataTable.module.css";
+import { Notice } from "../../components/ui/Notice";
 import { TableCard } from "../../components/ui/TableCard";
 import type { Cliente } from "./types";
 
@@ -12,37 +13,39 @@ type ClientesTableProps = {
 export function ClientesTable({ data, onEdit, onDelete }: ClientesTableProps) {
   if (data.length === 0) {
     return (
-      <Card>
-        <p className="text-sm text-slate-600">No se encontraron clientes.</p>
-      </Card>
+      <Notice variant="empty" message="No se encontraron clientes." />
     );
   }
 
   return (
     <TableCard>
-      <table className="min-w-full divide-y divide-slate-200 text-sm">
-        <thead className="sticky top-0 z-10 bg-slate-50 text-slate-600">
+      <table className={styles.table}>
+        <thead className={styles.head}>
           <tr>
-            <th className="px-4 py-3 text-left font-medium">Nombre</th>
-            <th className="px-4 py-3 text-left font-medium">ID</th>
-            <th className="px-4 py-3 text-left font-medium">Correo</th>
-            <th className="px-4 py-3 text-left font-medium">Telefono</th>
-            <th className="px-4 py-3 text-left font-medium">Pais</th>
-            <th className="px-4 py-3 text-left font-medium">Activo</th>
-            <th className="px-4 py-3 text-left font-medium">Acciones</th>
+            <th className={styles.th}>Nombre</th>
+            <th className={styles.th}>ID</th>
+            <th className={styles.th}>Correo</th>
+            <th className={styles.th}>Telefono</th>
+            <th className={styles.th}>Pais</th>
+            <th className={styles.th}>Activo</th>
+            <th className={styles.th}>Acciones</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-200 bg-white text-slate-700">
+        <tbody className={styles.body}>
           {data.map((cliente) => (
-            <tr key={cliente.id} className="hover:bg-slate-50">
-              <td className="px-4 py-3">{`${cliente.first_name} ${cliente.last_name}`.trim()}</td>
-              <td className="px-4 py-3">{cliente.id_number}</td>
-              <td className="px-4 py-3">{cliente.email || "-"}</td>
-              <td className="px-4 py-3">{cliente.phone || "-"}</td>
-              <td className="px-4 py-3">{cliente.country}</td>
-              <td className="px-4 py-3">{cliente.is_active ? "Si" : "No"}</td>
-              <td className="px-4 py-3">
-                <div className="flex gap-2">
+            <tr key={cliente.id} className={styles.row}>
+              <td className={styles.td}>
+                <div className={styles.cellStack}>
+                  <p className={styles.primaryText}>{`${cliente.first_name} ${cliente.last_name}`.trim()}</p>
+                </div>
+              </td>
+              <td className={styles.td}>{cliente.id_number}</td>
+              <td className={styles.td}>{cliente.email || "-"}</td>
+              <td className={styles.td}>{cliente.phone || "-"}</td>
+              <td className={styles.td}>{cliente.country}</td>
+              <td className={styles.td}>{cliente.is_active ? "Si" : "No"}</td>
+              <td className={styles.td}>
+                <div className={styles.actions}>
                   <Button type="button" onClick={() => onEdit(cliente)}>
                     Editar
                   </Button>

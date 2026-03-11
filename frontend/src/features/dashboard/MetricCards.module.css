@@ -1,0 +1,27 @@
+.card {
+  @apply flex min-h-40 flex-col items-center justify-center text-center;
+}
+
+.label {
+  @apply text-lg text-slate-600;
+}
+
+.value {
+  @apply mt-3 text-4xl font-semibold tracking-tight text-slate-900 md:text-5xl;
+}
+
+.badges {
+  @apply mt-4 flex flex-wrap items-center justify-center gap-2;
+}
+
+.badge {
+  @apply inline-flex min-h-[2rem] items-center justify-center rounded-full border px-3 py-1 text-sm font-medium;
+}
+
+.saleBadge {
+  @apply border-slate-200 bg-slate-100 text-slate-700;
+}
+
+.promoBadge {
+  @apply border-amber-200 bg-amber-50 text-amber-700;
+}

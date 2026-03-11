@@ -12,6 +12,10 @@ export function createPedido(payload: OrderCreatePayload): Promise<Pedido> {
   return apiPost<Pedido>("/api/pedidos/", payload);
 }
 
+export function getPedido(id: number): Promise<Pedido> {
+  return apiGet<Pedido>(`/api/pedidos/${id}/`);
+}
+
 export function updatePedido(id: number, payloadPartial: Partial<OrderCreatePayload>): Promise<Pedido> {
   return apiPatch<Pedido>(`/api/pedidos/${id}/`, payloadPartial);
 }

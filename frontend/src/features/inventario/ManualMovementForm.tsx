@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
+import formStyles from "../../components/ui/FormLayout.module.css";
 import { toApiError } from "../../lib/api";
 import { useVariantesForInventario } from "./hooks";
 import type { ManualMovementPayload, ManualMovementType } from "./types";
@@ -131,82 +132,96 @@ export function ManualMovementForm({ onSubmit, loading }: ManualMovementFormProp
         : "Seleccione un tipo de movimiento para ver la guia.";
 
   return (
-    <Card className="space-y-3">
-      <h2 className="text-lg font-semibold text-slate-900">Nuevo movimiento manual</h2>
+    <Card className="mx-auto w-full max-w-4xl space-y-6">
+      <div className={formStyles.intro}>
+        <p className={formStyles.introTitle}>Nuevo movimiento manual</p>
+        <p className={formStyles.introText}>
+          Registra produccion o ajustes manuales. La validacion final siempre la define el backend.
+        </p>
+      </div>
 
       {formError.detail && (
-        <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{formError.detail}</p>
+        <p className={formStyles.errorBox}>{formError.detail}</p>
       )}
       {formError.non_field_errors?.map((message, index) => (
-        <p key={`${message}-${index}`} className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+        <p key={`${message}-${index}`} className={formStyles.errorBox}>
           {message}
         </p>
       ))}
 
       {variantesQuery.isLoading && <p className="text-sm text-slate-600">Cargando variantes...</p>}
       {variantesQuery.isError && (
-        <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+        <p className={formStyles.errorBox}>
           {toApiError(variantesQuery.error).detail}
         </p>
       )}
 
-      <div className="grid gap-3">
-        <label htmlFor="movement_type">Tipo de movimiento</label>
-        <select id="movement_type" value={movementType} onChange={(event) => setMovementType(event.target.value as ManualMovementType | "")}>
-          <option value="">Seleccione un tipo</option>
-          <option value="PRODUCTION">Produccion</option>
-          <option value="ADJUSTMENT">Ajuste</option>
-        </select>
-        {formError.fieldErrors.movement_type?.map((message, index) => (
-          <p key={`${message}-${index}`} className="text-xs text-rose-600">
-            {message}
-          </p>
-        ))}
-
-        <label htmlFor="product_variant">Variante de producto</label>
-        <select id="product_variant" value={productVariant} onChange={(event) => setProductVariant(Number(event.target.value))}>
-          <option value={0}>Seleccione una variante</option>
-          {variants.map((variant) => (
-            <option key={variant.id} value={variant.id}>
-              {variant.product_name} - {variant.measure_mm}mm
-            </option>
+      <div className={formStyles.formGrid}>
+        <div className={formStyles.field}>
+          <label htmlFor="movement_type">Tipo de movimiento</label>
+          <select id="movement_type" value={movementType} onChange={(event) => setMovementType(event.target.value as ManualMovementType | "")}>
+            <option value="">Seleccione un tipo</option>
+            <option value="PRODUCTION">Produccion</option>
+            <option value="ADJUSTMENT">Ajuste</option>
+          </select>
+          {formError.fieldErrors.movement_type?.map((message, index) => (
+            <p key={`${message}-${index}`} className={formStyles.errorText}>
+              {message}
+            </p>
           ))}
-        </select>
-        {formError.fieldErrors.product_variant?.map((message, index) => (
-          <p key={`${message}-${index}`} className="text-xs text-rose-600">
-            {message}
-          </p>
-        ))}
+        </div>
 
-        <label htmlFor="quantity_pairs">Cantidad de pares</label>
-        <input
-          id="quantity_pairs"
-          type="number"
-          value={quantityPairs}
-          onChange={(event) => setQuantityPairs(event.target.value === "" ? "" : Number(event.target.value))}
-        />
-        {formError.fieldErrors.quantity_pairs?.map((message, index) => (
-          <p key={`${message}-${index}`} className="text-xs text-rose-600">
-            {message}
-          </p>
-        ))}
+        <div className={formStyles.field}>
+          <label htmlFor="product_variant">Variante de producto</label>
+          <select id="product_variant" value={productVariant} onChange={(event) => setProductVariant(Number(event.target.value))}>
+            <option value={0}>Seleccione una variante</option>
+            {variants.map((variant) => (
+              <option key={variant.id} value={variant.id}>
+                {variant.product_name} - {variant.measure_mm}mm
+              </option>
+            ))}
+          </select>
+          {formError.fieldErrors.product_variant?.map((message, index) => (
+            <p key={`${message}-${index}`} className={formStyles.errorText}>
+              {message}
+            </p>
+          ))}
+        </div>
 
-        <label htmlFor="note">
-          Nota {movementType === "ADJUSTMENT" ? "(obligatoria)" : "(opcional)"}
-        </label>
-        <textarea id="note" value={note} onChange={(event) => setNote(event.target.value)} rows={3} />
-        {formError.fieldErrors.note?.map((message, index) => (
-          <p key={`${message}-${index}`} className="text-xs text-rose-600">
-            {message}
-          </p>
-        ))}
+        <div className={formStyles.field}>
+          <label htmlFor="quantity_pairs">Cantidad de pares</label>
+          <input
+            id="quantity_pairs"
+            type="number"
+            value={quantityPairs}
+            onChange={(event) => setQuantityPairs(event.target.value === "" ? "" : Number(event.target.value))}
+          />
+          <p className={formStyles.hint}>{hintText}</p>
+          {formError.fieldErrors.quantity_pairs?.map((message, index) => (
+            <p key={`${message}-${index}`} className={formStyles.errorText}>
+              {message}
+            </p>
+          ))}
+        </div>
+
+        <div className={`${formStyles.field} ${formStyles.fieldFull}`}>
+          <label htmlFor="note">
+            Nota {movementType === "ADJUSTMENT" ? "(obligatoria)" : "(opcional)"}
+          </label>
+          <textarea id="note" value={note} onChange={(event) => setNote(event.target.value)} rows={4} />
+          {formError.fieldErrors.note?.map((message, index) => (
+            <p key={`${message}-${index}`} className={formStyles.errorText}>
+              {message}
+            </p>
+          ))}
+        </div>
       </div>
 
-      <p className="text-sm text-slate-600">{hintText}</p>
-
-      <Button variant="primary" onClick={submit} disabled={loading || variantesQuery.isLoading}>
-        {loading ? "Guardando..." : "Crear movimiento"}
-      </Button>
+      <div className={formStyles.actions}>
+        <Button variant="primary" onClick={submit} disabled={loading || variantesQuery.isLoading}>
+          {loading ? "Guardando..." : "Crear movimiento"}
+        </Button>
+      </div>
     </Card>
   );
 }

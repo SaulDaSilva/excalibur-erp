@@ -1,4 +1,5 @@
-import { Card } from "../../components/ui/Card";
+import styles from "../../components/ui/DataTable.module.css";
+import { Notice } from "../../components/ui/Notice";
 import { PaginationControls } from "../../components/ui/PaginationControls";
 import { TableCard } from "../../components/ui/TableCard";
 import type { PaginatedResponse } from "../clientes/types";
@@ -18,34 +19,33 @@ export function StockTable({ data, page, pageSize, onPageChange, loading }: Stoc
 
   return (
     <section className="space-y-3">
-      <h3 className="text-base font-semibold text-slate-900">Stock</h3>
-      {loading && <p>Cargando...</p>}
-      {!loading && rows.length === 0 && (
-        <Card>
-          <p className="text-sm text-slate-600">No hay registros de stock.</p>
-        </Card>
-      )}
+      {loading && <Notice variant="info" message="Cargando..." />}
+      {!loading && rows.length === 0 && <Notice variant="empty" message="No hay registros de stock." />}
 
       {rows.length > 0 && (
         <TableCard>
-          <table className="min-w-full divide-y divide-slate-200 text-sm">
-            <thead className="sticky top-0 z-10 bg-slate-50 text-slate-600">
+          <table className={styles.table}>
+            <thead className={styles.head}>
               <tr>
-                <th className="px-4 py-3 text-left font-medium">Variante</th>
-                <th className="px-4 py-3 text-left font-medium">Producto</th>
-                <th className="px-4 py-3 text-left font-medium">Medida</th>
-                <th className="px-4 py-3 text-left font-medium">Stock</th>
-                <th className="px-4 py-3 text-left font-medium">Activo</th>
+                <th className={styles.th}>Variante</th>
+                <th className={styles.th}>Producto</th>
+                <th className={styles.th}>Medida</th>
+                <th className={styles.th}>Stock</th>
+                <th className={styles.th}>Activo</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 bg-white text-slate-700">
+            <tbody className={styles.body}>
               {rows.map((row) => (
-                <tr key={row.product_variant_id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3">{row.product_variant_id}</td>
-                  <td className="px-4 py-3">{row.product_name}</td>
-                  <td className="px-4 py-3">{row.measure_mm}mm</td>
-                  <td className="px-4 py-3">{row.stock_pairs}</td>
-                  <td className="px-4 py-3">{row.is_active ? "Si" : "No"}</td>
+                <tr key={row.product_variant_id} className={styles.row}>
+                  <td className={styles.td}>{row.product_variant_id}</td>
+                  <td className={styles.td}>
+                    <div className={styles.cellStack}>
+                      <p className={styles.primaryText}>{row.product_name}</p>
+                    </div>
+                  </td>
+                  <td className={styles.td}>{row.measure_mm}mm</td>
+                  <td className={styles.td}>{row.stock_pairs}</td>
+                  <td className={styles.td}>{row.is_active ? "Si" : "No"}</td>
                 </tr>
               ))}
             </tbody>

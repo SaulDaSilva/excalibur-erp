@@ -1,0 +1,31 @@
+.panel {
+  @apply space-y-4;
+}
+
+.header {
+  @apply flex flex-wrap items-start justify-between gap-3;
+}
+
+.title {
+  @apply text-sm font-semibold text-slate-900;
+}
+
+.subtitle {
+  @apply mt-1 text-sm text-slate-600;
+}
+
+.filterGrid {
+  @apply grid gap-3 sm:grid-cols-2 xl:grid-cols-4;
+}
+
+.wideGrid {
+  @apply xl:grid-cols-5;
+}
+
+.checkbox {
+  @apply flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700;
+}
+
+.checkboxInput {
+  @apply h-4 w-4 rounded border-slate-300;
+}

@@ -1,4 +1,4 @@
-import { Card } from "../../components/ui/Card";
+import { FilterPanel } from "../../components/ui/FilterPanel";
 import type { Variante } from "../catalogo/api";
 
 export type MovementFilterState = {
@@ -17,9 +17,11 @@ type MovementFiltersProps = {
 
 export function MovementFilters({ value, variantes, onChange }: MovementFiltersProps) {
   return (
-    <Card>
-      <h3 className="mb-3 text-base font-semibold text-slate-900">Filtros de movimientos</h3>
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+    <FilterPanel
+      title="Filtros"
+      subtitle="Filtra por tipo, variante, pedido o rango de fechas."
+      gridClassName="xl:grid-cols-5"
+    >
         <select value={value.movementType} onChange={(event) => onChange({ ...value, movementType: event.target.value })}>
           <option value="">Todos los tipos</option>
           <option value="PRODUCTION">Produccion</option>
@@ -50,7 +52,6 @@ export function MovementFilters({ value, variantes, onChange }: MovementFiltersP
         />
         <input type="date" value={value.from} onChange={(event) => onChange({ ...value, from: event.target.value })} />
         <input type="date" value={value.to} onChange={(event) => onChange({ ...value, to: event.target.value })} />
-      </div>
-    </Card>
+    </FilterPanel>
   );
 }

@@ -2,15 +2,17 @@ import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 
 import { Button } from "../../components/ui/Button";
+import formStyles from "../../components/ui/FormLayout.module.css";
 import { toApiError } from "../../lib/api";
+import type { Cliente } from "../clientes/types";
+import { PedidoCustomerSearch } from "./PedidoCustomerSearch";
 import { PedidoItemsEditor } from "./PedidoItemsEditor";
-import { useClientesForSelect, useDireccionesByCliente, useVariantesForPedidos } from "./hooks";
+import { useDireccionesByCliente, useVariantesForPedidos } from "./hooks";
 import type { OrderCreatePayload, PedidoItemPayload } from "./types";
 
-type PedidoFormModalProps = {
-  open: boolean;
-  onClose: () => void;
+type PedidoFormProps = {
   onSubmit: (payload: OrderCreatePayload) => Promise<void>;
+  onCancel: () => void;
 };
 
 type PedidoFormState = {
@@ -25,6 +27,13 @@ const initialItem: PedidoItemPayload = {
   product_variant: 0,
   quantity_pairs: 1,
   unit_price: "1.00",
+};
+
+const initialFormState: PedidoFormState = {
+  customer: 0,
+  shipping_address: 0,
+  channel: "WHATSAPP",
+  items: [{ ...initialItem }],
 };
 
 const schema = z
@@ -63,17 +72,12 @@ const schema = z
     });
   });
 
-export function PedidoFormModal({ open, onClose, onSubmit }: PedidoFormModalProps) {
-  const [form, setForm] = useState<PedidoFormState>({
-    customer: 0,
-    shipping_address: 0,
-    channel: "WHATSAPP",
-    items: [initialItem],
-  });
+export function PedidoForm({ onSubmit, onCancel }: PedidoFormProps) {
+  const [form, setForm] = useState<PedidoFormState>(initialFormState);
+  const [selectedCustomer, setSelectedCustomer] = useState<Cliente | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const clientesQuery = useClientesForSelect();
   const variantesQuery = useVariantesForPedidos();
   const direccionesQuery = useDireccionesByCliente(form.customer > 0 ? form.customer : null);
 
@@ -82,10 +86,6 @@ export function PedidoFormModal({ open, onClose, onSubmit }: PedidoFormModalProp
   }, [form.customer]);
 
   const addresses = useMemo(() => direccionesQuery.data ?? [], [direccionesQuery.data]);
-
-  if (!open) {
-    return null;
-  }
 
   const setItemPatch = (index: number, patch: Partial<PedidoItemPayload>) => {
     setForm((previous) => {
@@ -96,7 +96,10 @@ export function PedidoFormModal({ open, onClose, onSubmit }: PedidoFormModalProp
   };
 
   const addItem = () => {
-    setForm((previous) => ({ ...previous, items: [...previous.items, initialItem] }));
+    setForm((previous) => ({
+      ...previous,
+      items: [...previous.items, { ...initialItem }],
+    }));
   };
 
   const removeItem = (index: number) => {
@@ -117,13 +120,8 @@ export function PedidoFormModal({ open, onClose, onSubmit }: PedidoFormModalProp
     try {
       setIsSubmitting(true);
       await onSubmit(parsed.data);
-      setForm({
-        customer: 0,
-        shipping_address: 0,
-        channel: "WHATSAPP",
-        items: [initialItem],
-      });
-      onClose();
+      setForm(initialFormState);
+      setSelectedCustomer(null);
     } catch (error) {
       setErrorMessage(toApiError(error).detail);
     } finally {
@@ -132,32 +130,43 @@ export function PedidoFormModal({ open, onClose, onSubmit }: PedidoFormModalProp
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-4"
-    >
-      <div className="w-full max-w-[680px] rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-5">
-        <h2 className="text-lg font-semibold text-slate-900">Nuevo pedido</h2>
+    <div className="space-y-6">
+      {variantesQuery.isLoading && <p className="text-sm text-slate-600">Cargando...</p>}
+      {variantesQuery.isError && (
+        <p className={formStyles.errorBox}>
+          {toApiError(variantesQuery.error).detail}
+        </p>
+      )}
 
-        {(clientesQuery.isLoading || variantesQuery.isLoading) && <p className="mt-3 text-sm text-slate-600">Cargando...</p>}
-        {(clientesQuery.isError || variantesQuery.isError) && (
-          <p className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-            {toApiError(clientesQuery.error ?? variantesQuery.error).detail}
-          </p>
-        )}
+      <div className={formStyles.intro}>
+        <p className={formStyles.introTitle}>Crear pedido</p>
+        <p className={formStyles.introText}>
+          Selecciona cliente, direccion de envio y agrega los items que formaran el pedido.
+        </p>
+      </div>
 
-        <div className="mt-4 space-y-3">
-          <label>Cliente</label>
-          <select value={form.customer} onChange={(event) => setForm({ ...form, customer: Number(event.target.value) })}>
-            <option value={0}>Seleccione un cliente</option>
-            {(clientesQuery.data?.results ?? []).map((cliente) => (
-              <option key={cliente.id} value={cliente.id}>
-                {cliente.first_name} {cliente.last_name} ({cliente.id_number})
-              </option>
-            ))}
-          </select>
+      <div className={formStyles.formGrid}>
+        <PedidoCustomerSearch
+          selectedCustomer={selectedCustomer}
+          onSelect={(customer) => {
+            setSelectedCustomer(customer);
+            setForm((previous) => ({
+              ...previous,
+              customer: customer.id,
+              shipping_address: 0,
+            }));
+          }}
+          onClear={() => {
+            setSelectedCustomer(null);
+            setForm((previous) => ({
+              ...previous,
+              customer: 0,
+              shipping_address: 0,
+            }));
+          }}
+        />
 
+        <div className={formStyles.field}>
           <label>Direccion de envio</label>
           <select
             value={form.shipping_address}
@@ -171,7 +180,12 @@ export function PedidoFormModal({ open, onClose, onSubmit }: PedidoFormModalProp
               </option>
             ))}
           </select>
+          {form.customer > 0 && direccionesQuery.isLoading && (
+            <p className={formStyles.hint}>Cargando direcciones...</p>
+          )}
+        </div>
 
+        <div className={formStyles.field}>
           <label>Canal</label>
           <select
             value={form.channel}
@@ -180,28 +194,26 @@ export function PedidoFormModal({ open, onClose, onSubmit }: PedidoFormModalProp
             <option value="WHATSAPP">WhatsApp</option>
             <option value="CALL">Llamada</option>
           </select>
-
-          <PedidoItemsEditor
-            items={form.items}
-            variantes={variantesQuery.data?.results ?? []}
-            onAdd={addItem}
-            onRemove={removeItem}
-            onChange={setItemPatch}
-          />
         </div>
+      </div>
 
-        {errorMessage && (
-          <p className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{errorMessage}</p>
-        )}
+      <PedidoItemsEditor
+        items={form.items}
+        variantes={variantesQuery.data?.results ?? []}
+        onAdd={addItem}
+        onRemove={removeItem}
+        onChange={setItemPatch}
+      />
 
-        <div className="mt-4 flex gap-2">
-          <Button type="button" variant="primary" onClick={submit} disabled={isSubmitting}>
-            {isSubmitting ? "Guardando..." : "Crear"}
-          </Button>
-          <Button type="button" onClick={onClose}>
-            Cancelar
-          </Button>
-        </div>
+      {errorMessage && <p className={formStyles.errorBox}>{errorMessage}</p>}
+
+      <div className={formStyles.actions}>
+        <Button type="button" variant="primary" onClick={submit} disabled={isSubmitting}>
+          {isSubmitting ? "Guardando..." : "Crear"}
+        </Button>
+        <Button type="button" onClick={onCancel}>
+          Cancelar
+        </Button>
       </div>
     </div>
   );

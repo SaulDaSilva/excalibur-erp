@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "../components/ui/Button";
+import { Notice } from "../components/ui/Notice";
 import { PageHeader } from "../components/ui/PageHeader";
 import { MovementFilters, type MovementFilterState } from "../features/inventario/MovementFilters";
 import { MovimientosTable } from "../features/inventario/MovimientosTable";
@@ -49,17 +50,13 @@ export function InventarioMovimientosPage() {
       />
 
       {variantesQuery.isError && (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-          {toApiError(variantesQuery.error).detail}
-        </p>
+        <Notice variant="error" message={toApiError(variantesQuery.error).detail} />
       )}
 
       <MovementFilters value={movementFilters} variantes={variantOptions} onChange={setMovementFilters} />
 
       {movimientosQuery.isError && (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-          {toApiError(movimientosQuery.error).detail}
-        </p>
+        <Notice variant="error" message={toApiError(movimientosQuery.error).detail} />
       )}
 
       <MovimientosTable

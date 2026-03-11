@@ -1,0 +1,79 @@
+.loadingTitle {
+  @apply text-lg font-semibold text-slate-900;
+}
+
+.loadingText {
+  @apply mt-3 text-sm text-slate-600;
+}
+
+.card {
+  @apply p-0;
+}
+
+.header {
+  @apply flex items-center justify-between border-b border-slate-200 px-4 py-3 md:px-5;
+}
+
+.title {
+  @apply text-lg font-semibold text-slate-900;
+}
+
+.tableCard {
+  @apply rounded-none border-0 shadow-none;
+}
+
+.scrollArea {
+  @apply h-[28rem];
+}
+
+.table {
+  @apply min-w-full text-sm;
+}
+
+.head {
+  @apply sticky top-0 z-10 bg-slate-50 text-slate-600;
+}
+
+.cell {
+  @apply px-4 py-3 text-center align-middle font-medium md:px-5;
+}
+
+.cellRight {
+  @apply px-4 py-3 text-center align-middle font-medium md:px-5;
+}
+
+.body {
+  @apply divide-y divide-slate-200;
+}
+
+.empty {
+  @apply px-4 py-4 text-center text-slate-500 md:px-5;
+}
+
+.row {
+  @apply hover:bg-slate-50;
+}
+
+.bodyCell {
+  @apply px-4 py-3 text-center align-middle md:px-5;
+}
+
+.summaryCell {
+  @apply px-4 py-3 text-center align-middle text-slate-700 md:px-5;
+}
+
+.actionCell {
+  @apply px-4 py-3 text-center align-middle md:px-5;
+}
+
+.customerName {
+  @apply font-medium text-slate-900;
+}
+
+.customerMeta {
+  @apply text-xs text-slate-500;
+}
+
+.actionLink {
+  @apply inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 shadow-sm hover:bg-slate-50;
+}

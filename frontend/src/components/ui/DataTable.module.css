@@ -1,0 +1,47 @@
+.table {
+  @apply min-w-full divide-y divide-slate-200 text-sm;
+}
+
+.head {
+  @apply sticky top-0 z-10 bg-slate-50 text-slate-600;
+}
+
+.th {
+  @apply px-4 py-3 text-center align-middle font-medium;
+}
+
+.thRight {
+  @apply px-4 py-3 text-center align-middle font-medium;
+}
+
+.body {
+  @apply divide-y divide-slate-200 bg-white text-slate-700;
+}
+
+.row {
+  @apply hover:bg-slate-50;
+}
+
+.td {
+  @apply px-4 py-3 text-center align-middle;
+}
+
+.tdRight {
+  @apply px-4 py-3 text-center align-middle;
+}
+
+.cellStack {
+  @apply flex flex-col items-center justify-center space-y-1 text-center;
+}
+
+.primaryText {
+  @apply font-medium text-slate-900;
+}
+
+.secondaryText {
+  @apply text-xs text-slate-500;
+}
+
+.actions {
+  @apply flex flex-nowrap items-center justify-center gap-2 whitespace-nowrap;
+}

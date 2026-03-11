@@ -3,7 +3,9 @@ import { useLocation } from "react-router-dom";
 const TITLES: Record<string, string> = {
   "/dashboard": "Resumen",
   "/clientes": "Clientes",
+  "/clientes/nuevo": "Nuevo cliente",
   "/pedidos": "Pedidos",
+  "/pedidos/nuevo": "Nuevo pedido",
   "/inventario": "Inventario",
   "/inventario/stock": "Stock",
   "/inventario/movimientos": "Movimientos de Inventario",
@@ -11,6 +13,12 @@ const TITLES: Record<string, string> = {
 };
 
 function getTitle(pathname: string): string {
+  if (pathname.startsWith("/clientes/") && pathname.endsWith("/editar")) {
+    return "Editar cliente";
+  }
+  if (pathname.startsWith("/pedidos/") && pathname !== "/pedidos/nuevo") {
+    return "Detalle de pedido";
+  }
   return TITLES[pathname] ?? "Excalibur ERP";
 }
 

@@ -1,9 +1,18 @@
 export type Metrics = {
   pending_orders_count: number;
   sales_last_7_days_usd: string;
-  current_stock_pairs: number;
+  sold_pairs_last_7_days: number;
+  promo_pairs_last_7_days: number;
   low_stock_variants_count: number;
   low_stock_threshold: number;
+};
+
+export type DashboardStockVariant = {
+  product_variant_id: number;
+  product_name: string;
+  measure_mm: number;
+  stock_pairs: number;
+  is_active: boolean;
 };
 
 export type PendingOrderItem = {

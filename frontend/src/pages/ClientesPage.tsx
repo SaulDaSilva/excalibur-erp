@@ -1,38 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "../components/ui/Button";
-import { Card } from "../components/ui/Card";
+import { FilterPanel, filterPanelStyles } from "../components/ui/FilterPanel";
+import { Notice } from "../components/ui/Notice";
 import { PaginationControls } from "../components/ui/PaginationControls";
 import { PageHeader } from "../components/ui/PageHeader";
 import { toApiError } from "../lib/api";
-import { ClienteFormModal } from "../features/clientes/ClienteFormModal";
 import { ClientesTable } from "../features/clientes/ClientesTable";
-import {
-  useClientes,
-  useCreateCliente,
-  useDeleteCliente,
-  usePaises,
-  useUpdateCliente,
-} from "../features/clientes/hooks";
-import type { Cliente, ClienteCreateInput, ClienteUpdateInput } from "../features/clientes/types";
+import { useClientes, useDeleteCliente } from "../features/clientes/hooks";
+import type { Cliente } from "../features/clientes/types";
 
 const PAGE_SIZE = 10;
 
 export function ClientesPage() {
+  const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [includeInactive, setIncludeInactive] = useState(false);
   const [page, setPage] = useState(1);
-  const [modalMode, setModalMode] = useState<"create" | "edit">("create");
-  const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
-  const [openModal, setOpenModal] = useState(false);
   const [pageError, setPageError] = useState("");
 
   const queryClient = useQueryClient();
   const clientesQuery = useClientes({ page, pageSize: PAGE_SIZE, q, includeInactive });
-  const paisesQuery = usePaises();
-  const createCliente = useCreateCliente();
-  const updateCliente = useUpdateCliente();
   const deleteCliente = useDeleteCliente();
 
   const totalPages = useMemo(() => {
@@ -46,15 +36,6 @@ export function ClientesPage() {
 
   const refreshClientes = async () => {
     await queryClient.invalidateQueries({ queryKey: ["clientes"] });
-  };
-
-  const handleSave = async (payload: ClienteCreateInput | ClienteUpdateInput) => {
-    if (modalMode === "create") {
-      await createCliente.mutateAsync(payload as ClienteCreateInput);
-    } else if (selectedCliente) {
-      await updateCliente.mutateAsync({ id: selectedCliente.id, data: payload as ClienteUpdateInput });
-    }
-    await refreshClientes();
   };
 
   const handleDelete = async (cliente: Cliente) => {
@@ -77,63 +58,40 @@ export function ClientesPage() {
           <Button
             variant="primary"
             type="button"
-            onClick={() => {
-              setModalMode("create");
-              setSelectedCliente(null);
-              setOpenModal(true);
-            }}
+            onClick={() => navigate("/clientes/nuevo")}
           >
             Nuevo cliente
           </Button>
         }
       />
 
-      <Card>
-        <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
+      <FilterPanel title="Filtros" subtitle="Busca clientes y controla si deseas incluir registros inactivos.">
           <input placeholder="Buscar..." value={q} onChange={(event) => setQ(event.target.value)} />
-          <label className="flex items-center gap-2">
+          <label className={filterPanelStyles.checkbox}>
             <input
-              className="h-4 w-4 rounded border-slate-300"
+              className={filterPanelStyles.checkboxInput}
               type="checkbox"
               checked={includeInactive}
               onChange={(event) => setIncludeInactive(event.target.checked)}
             />
             Incluir inactivos
           </label>
-        </div>
-      </Card>
+      </FilterPanel>
 
-      {(clientesQuery.isLoading || paisesQuery.isLoading) && <p className="text-sm text-slate-600">Cargando...</p>}
-      {(clientesQuery.isError || paisesQuery.isError) && (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-          {toApiError(clientesQuery.error ?? paisesQuery.error).detail}
-        </p>
-      )}
-      {pageError && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{pageError}</p>}
+      {clientesQuery.isLoading && <Notice variant="info" message="Cargando..." />}
+      {clientesQuery.isError && <Notice variant="error" message={toApiError(clientesQuery.error).detail} />}
+      {pageError && <Notice variant="error" message={pageError} />}
 
       {clientesQuery.data && (
         <>
           <ClientesTable
             data={clientesQuery.data.results}
-            onEdit={(cliente) => {
-              setModalMode("edit");
-              setSelectedCliente(cliente);
-              setOpenModal(true);
-            }}
+            onEdit={(cliente) => navigate(`/clientes/${cliente.id}/editar`)}
             onDelete={handleDelete}
           />
           <PaginationControls page={page} totalPages={totalPages} onPageChange={setPage} />
         </>
       )}
-
-      <ClienteFormModal
-        open={openModal}
-        mode={modalMode}
-        initialData={selectedCliente}
-        paises={paisesQuery.data ?? []}
-        onSubmit={handleSave}
-        onClose={() => setOpenModal(false)}
-      />
     </section>
   );
 }

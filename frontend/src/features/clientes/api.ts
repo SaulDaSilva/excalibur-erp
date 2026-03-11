@@ -5,6 +5,8 @@ import type {
   ClienteCreateInput,
   ClientesListParams,
   Direccion,
+  DireccionCreateInput,
+  DireccionUpdateInput,
   ClienteUpdateInput,
   PaginatedResponse,
   Pais,
@@ -17,6 +19,10 @@ export function listClientes(params: ClientesListParams): Promise<PaginatedRespo
 
 export function createCliente(data: ClienteCreateInput): Promise<Cliente> {
   return apiPost<Cliente>("/api/clientes/", data);
+}
+
+export function getCliente(id: number): Promise<Cliente> {
+  return apiGet<Cliente>(`/api/clientes/${id}/`);
 }
 
 export function updateCliente(id: number, data: ClienteUpdateInput): Promise<Cliente> {
@@ -37,4 +43,16 @@ export function listClientesForSelect(): Promise<PaginatedResponse<Cliente>> {
 
 export function listDirecciones(customerId: number): Promise<Direccion[]> {
   return apiGet<Direccion[]>(`/api/clientes/direcciones/?customer_id=${customerId}`);
+}
+
+export function createDireccion(data: DireccionCreateInput): Promise<Direccion> {
+  return apiPost<Direccion>("/api/clientes/direcciones/", data);
+}
+
+export function updateDireccion(id: number, data: DireccionUpdateInput): Promise<Direccion> {
+  return apiPatch<Direccion>(`/api/clientes/direcciones/${id}/`, data);
+}
+
+export function deleteDireccion(id: number): Promise<null> {
+  return apiDelete<null>(`/api/clientes/direcciones/${id}/`);
 }

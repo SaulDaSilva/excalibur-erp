@@ -1,7 +1,24 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { createCliente, deleteCliente, listClientes, listPaises, updateCliente } from "./api";
-import type { ClienteCreateInput, ClientesListParams, ClienteUpdateInput } from "./types";
+import {
+  createCliente,
+  createDireccion,
+  deleteCliente,
+  deleteDireccion,
+  getCliente,
+  listClientes,
+  listDirecciones,
+  listPaises,
+  updateCliente,
+  updateDireccion,
+} from "./api";
+import type {
+  ClienteCreateInput,
+  ClientesListParams,
+  ClienteUpdateInput,
+  DireccionCreateInput,
+  DireccionUpdateInput,
+} from "./types";
 
 export function useClientes({ page, pageSize, q, includeInactive }: ClientesListParams) {
   return useQuery({
@@ -15,6 +32,22 @@ export function usePaises() {
   return useQuery({
     queryKey: ["paises"],
     queryFn: listPaises,
+  });
+}
+
+export function useCliente(id: number | null) {
+  return useQuery({
+    queryKey: ["cliente", id],
+    queryFn: () => getCliente(id as number),
+    enabled: id !== null,
+  });
+}
+
+export function useDirecciones(customerId: number | null) {
+  return useQuery({
+    queryKey: ["direcciones", customerId],
+    queryFn: () => listDirecciones(customerId as number),
+    enabled: customerId !== null,
   });
 }
 
@@ -33,5 +66,23 @@ export function useUpdateCliente() {
 export function useDeleteCliente() {
   return useMutation({
     mutationFn: (id: number) => deleteCliente(id),
+  });
+}
+
+export function useCreateDireccion() {
+  return useMutation({
+    mutationFn: (data: DireccionCreateInput) => createDireccion(data),
+  });
+}
+
+export function useUpdateDireccion() {
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: DireccionUpdateInput }) => updateDireccion(id, data),
+  });
+}
+
+export function useDeleteDireccion() {
+  return useMutation({
+    mutationFn: (id: number) => deleteDireccion(id),
   });
 }

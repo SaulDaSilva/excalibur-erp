@@ -1,73 +1,76 @@
 import { Button } from "../../components/ui/Button";
-import { Card } from "../../components/ui/Card";
+import styles from "../../components/ui/DataTable.module.css";
+import { Notice } from "../../components/ui/Notice";
 import { TableCard } from "../../components/ui/TableCard";
+import { formatPedidoCurrency, formatPedidoDateTime, formatPedidoStatus } from "./formatters";
+import { PedidoItemsBadges } from "./PedidoItemsBadges";
 import type { Pedido } from "./types";
-
-function getStatusLabel(status: Pedido["status"]): string {
-  if (status === "PENDING") {
-    return "Pendiente";
-  }
-  if (status === "DISPATCHED") {
-    return "Despachado";
-  }
-  return "Cancelado";
-}
 
 type PedidosTableProps = {
   data: Pedido[];
+  onView: (pedido: Pedido) => void;
   onDispatch: (pedido: Pedido) => void;
   onCancel: (pedido: Pedido) => void;
   onDelete: (pedido: Pedido) => void;
 };
 
-export function PedidosTable({ data, onDispatch, onCancel, onDelete }: PedidosTableProps) {
+export function PedidosTable({ data, onView, onDispatch, onCancel, onDelete }: PedidosTableProps) {
   if (data.length === 0) {
     return (
-      <Card>
-        <p className="text-sm text-slate-600">No se encontraron pedidos.</p>
-      </Card>
+      <Notice variant="empty" message="No se encontraron pedidos." />
     );
   }
 
   return (
     <TableCard>
-      <table className="min-w-full divide-y divide-slate-200 text-sm">
-        <thead className="sticky top-0 z-10 bg-slate-50 text-slate-600">
+      <table className={styles.table}>
+        <thead className={styles.head}>
           <tr>
-            <th className="px-4 py-3 text-left font-medium">ID</th>
-            <th className="px-4 py-3 text-left font-medium">Creado</th>
-            <th className="px-4 py-3 text-left font-medium">Cliente</th>
-            <th className="px-4 py-3 text-left font-medium">Estado</th>
-            <th className="px-4 py-3 text-left font-medium">Total pares</th>
-            <th className="px-4 py-3 text-left font-medium">Total venta</th>
-            <th className="px-4 py-3 text-left font-medium">Acciones</th>
+            <th className={styles.th}>ID</th>
+            <th className={styles.th}>Creado</th>
+            <th className={styles.th}>Cliente</th>
+            <th className={styles.th}>Estado</th>
+            <th className={styles.th}>Items</th>
+            <th className={styles.th}>Total pares</th>
+            <th className={styles.th}>Total venta</th>
+            <th className={styles.th}>Acciones</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-200 bg-white text-slate-700">
+        <tbody className={styles.body}>
           {data.map((pedido) => (
-            <tr key={pedido.id} className="hover:bg-slate-50">
-              <td className="px-4 py-3">#{pedido.id}</td>
-              <td className="px-4 py-3">{new Date(pedido.created_at).toLocaleString()}</td>
-              <td className="px-4 py-3">
-                {pedido.customer.first_name} {pedido.customer.last_name}
+            <tr key={pedido.id} className={styles.row}>
+              <td className={styles.td}>#{pedido.id}</td>
+              <td className={styles.td}>{formatPedidoDateTime(pedido.created_at)}</td>
+              <td className={styles.td}>
+                <div className={styles.cellStack}>
+                  <p className={styles.primaryText}>
+                    {pedido.customer.first_name} {pedido.customer.last_name}
+                  </p>
+                </div>
               </td>
-              <td className="px-4 py-3">{getStatusLabel(pedido.status)}</td>
-              <td className="px-4 py-3">{pedido.total_pairs ?? "-"}</td>
-              <td className="px-4 py-3">{pedido.sold_amount ?? "-"}</td>
-              <td className="px-4 py-3">
-                <div className="flex flex-wrap gap-2">
+              <td className={styles.td}>{formatPedidoStatus(pedido.status)}</td>
+              <td className={styles.td}>
+                <PedidoItemsBadges items={pedido.items} />
+              </td>
+              <td className={styles.td}>{pedido.total_pairs ?? "-"}</td>
+              <td className={styles.td}>{formatPedidoCurrency(pedido.sold_amount)}</td>
+              <td className={styles.td}>
+                <div className={styles.actions}>
+                  <Button type="button" size="sm" onClick={() => onView(pedido)}>
+                    Ver detalle
+                  </Button>
                   {pedido.status === "PENDING" && (
-                    <Button type="button" variant="primary" onClick={() => onDispatch(pedido)}>
+                    <Button type="button" size="sm" variant="primary" onClick={() => onDispatch(pedido)}>
                       Despachar
                     </Button>
                   )}
                   {pedido.status !== "CANCELLED" && (
-                    <Button type="button" onClick={() => onCancel(pedido)}>
+                    <Button type="button" size="sm" onClick={() => onCancel(pedido)}>
                       Cancelar
                     </Button>
                   )}
                   {pedido.status === "PENDING" && (
-                    <Button type="button" variant="danger" onClick={() => onDelete(pedido)}>
+                    <Button type="button" size="sm" variant="danger" onClick={() => onDelete(pedido)}>
                       Eliminar
                     </Button>
                   )}

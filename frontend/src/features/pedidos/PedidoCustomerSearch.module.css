@@ -1,0 +1,43 @@
+.field {
+  @apply flex flex-col gap-2;
+}
+
+.selectedCard {
+  @apply rounded-xl border border-slate-200 bg-slate-50 p-3;
+}
+
+.selectedTitle {
+  @apply text-xs font-medium uppercase tracking-wide text-slate-500;
+}
+
+.selectedName {
+  @apply mt-1 text-sm font-semibold text-slate-900;
+}
+
+.selectedMeta {
+  @apply text-sm text-slate-600;
+}
+
+.results {
+  @apply max-h-64 space-y-2 overflow-auto rounded-xl border border-slate-200 bg-white p-2;
+}
+
+.resultButton {
+  @apply w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-left hover:bg-slate-50;
+}
+
+.resultName {
+  @apply text-sm font-medium text-slate-900;
+}
+
+.resultMeta {
+  @apply text-xs text-slate-500;
+}
+
+.hint {
+  @apply text-xs text-slate-500;
+}
+
+.error {
+  @apply text-xs text-rose-600;
+}

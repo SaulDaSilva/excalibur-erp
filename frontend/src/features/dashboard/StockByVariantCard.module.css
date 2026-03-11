@@ -1,0 +1,51 @@
+.root {
+  @apply xl:col-span-2;
+}
+
+.header {
+  @apply flex items-start justify-between gap-3;
+}
+
+.title {
+  @apply text-base text-slate-600;
+}
+
+.subtitle {
+  @apply mt-1 text-xs text-slate-500;
+}
+
+.feedback {
+  @apply mt-4 text-sm text-slate-600;
+}
+
+.list {
+  @apply mt-4 space-y-2;
+}
+
+.row {
+  @apply flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2;
+}
+
+.info {
+  @apply min-w-0;
+}
+
+.name {
+  @apply truncate text-sm font-medium text-slate-900;
+}
+
+.meta {
+  @apply text-xs text-slate-500;
+}
+
+.stock {
+  @apply text-right;
+}
+
+.stockValue {
+  @apply text-lg font-semibold text-slate-900;
+}
+
+.stockLabel {
+  @apply text-lg text-slate-500;
+}

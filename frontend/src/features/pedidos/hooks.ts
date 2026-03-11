@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { listVariantes } from "../catalogo/api";
-import { listClientesForSelect, listDirecciones } from "../clientes/api";
-import { cancelPedido, createPedido, deletePedido, dispatchPedido, listPedidos } from "./api";
+import { listClientes, listDirecciones } from "../clientes/api";
+import { cancelPedido, createPedido, deletePedido, dispatchPedido, getPedido, listPedidos } from "./api";
 import type { OrderCreatePayload, PedidoListParams } from "./types";
 
 export function usePedidos({ page, pageSize, q, status, customerId, from, to }: PedidoListParams) {
@@ -13,12 +13,23 @@ export function usePedidos({ page, pageSize, q, status, customerId, from, to }: 
   });
 }
 
+export function usePedido(id: number | null) {
+  return useQuery({
+    queryKey: ["pedido", id],
+    queryFn: () => getPedido(id as number),
+    enabled: id !== null,
+  });
+}
+
 export function useCreatePedido() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: OrderCreatePayload) => createPedido(payload),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["pedidos"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["pedidos"] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }),
+      ]);
     },
   });
 }
@@ -28,7 +39,14 @@ export function useDispatchPedido() {
   return useMutation({
     mutationFn: (id: number) => dispatchPedido(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["pedidos"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["pedidos"] }),
+        queryClient.invalidateQueries({ queryKey: ["pedido"] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboardStockByVariant"] }),
+        queryClient.invalidateQueries({ queryKey: ["stock_by_variant"] }),
+        queryClient.invalidateQueries({ queryKey: ["movimientos"] }),
+      ]);
     },
   });
 }
@@ -38,7 +56,14 @@ export function useCancelPedido() {
   return useMutation({
     mutationFn: (id: number) => cancelPedido(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["pedidos"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["pedidos"] }),
+        queryClient.invalidateQueries({ queryKey: ["pedido"] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboardStockByVariant"] }),
+        queryClient.invalidateQueries({ queryKey: ["stock_by_variant"] }),
+        queryClient.invalidateQueries({ queryKey: ["movimientos"] }),
+      ]);
     },
   });
 }
@@ -48,15 +73,26 @@ export function useDeletePedido() {
   return useMutation({
     mutationFn: (id: number) => deletePedido(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["pedidos"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["pedidos"] }),
+        queryClient.invalidateQueries({ queryKey: ["pedido"] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboardSummary"] }),
+      ]);
     },
   });
 }
 
-export function useClientesForSelect() {
+export function usePedidoCustomerSearch(query: string, enabled = true) {
   return useQuery({
-    queryKey: ["clientes-select"],
-    queryFn: listClientesForSelect,
+    queryKey: ["pedido-customer-search", query],
+    queryFn: () =>
+      listClientes({
+        page: 1,
+        pageSize: 10,
+        q: query,
+        includeInactive: false,
+      }),
+    enabled,
   });
 }
 

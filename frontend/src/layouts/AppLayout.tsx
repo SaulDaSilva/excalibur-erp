@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { Container } from "../components/ui/Container";
+import { Notice } from "../components/ui/Notice";
 import { logout } from "../features/auth/api";
 import { toApiError } from "../lib/api";
 import { Sidebar } from "./Sidebar";
@@ -38,9 +39,7 @@ export function AppLayout() {
         <TopBar />
         {errorMessage && (
           <div className="px-4 pt-4 md:px-6">
-            <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-              {errorMessage}
-            </p>
+            <Notice variant="error" message={errorMessage} />
           </div>
         )}
 

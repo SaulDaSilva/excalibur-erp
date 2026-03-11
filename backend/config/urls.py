@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path, re_path
+
+from apps.core.views import FrontendAppView
 
 urlpatterns = [
     path("api/auth/", include("apps.api_auth.api.urls")),
@@ -13,3 +15,8 @@ urlpatterns = [
 
 if settings.ENABLE_ADMIN:
     urlpatterns.insert(0, path(settings.ADMIN_URL_PATH, admin.site.urls))
+
+if settings.SERVE_FRONTEND:
+    urlpatterns.append(
+        re_path(r"^(?!api/|static/).*$", FrontendAppView.as_view(), name="frontend-app")
+    )

@@ -5,6 +5,7 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # backend/
 AUTH_USER_MODEL = "users.User"
+FRONTEND_DIST_DIR = BASE_DIR / "frontend_dist"
 env = environ.Env(
     DJANGO_DEBUG=(bool, False),
 )
@@ -32,6 +33,7 @@ render_external_hostname = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if render_external_hostname and render_external_hostname not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(render_external_hostname)
 ENABLE_ADMIN = env.bool("DJANGO_ENABLE_ADMIN", default=True)
+SERVE_FRONTEND = env.bool("DJANGO_SERVE_FRONTEND", default=False)
 ADMIN_URL_PATH = env("DJANGO_ADMIN_URL", default="admin/").strip().lstrip("/") or "admin/"
 if ADMIN_URL_PATH and not ADMIN_URL_PATH.endswith("/"):
     ADMIN_URL_PATH = f"{ADMIN_URL_PATH}/"
@@ -129,6 +131,10 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
+STATICFILES_DIRS = []
+if SERVE_FRONTEND and FRONTEND_DIST_DIR.exists():
+    STATICFILES_DIRS.append(FRONTEND_DIST_DIR)
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # DRF: session auth + locked down by default

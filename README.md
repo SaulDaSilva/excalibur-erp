@@ -64,13 +64,15 @@
 
 ## About The Project
 
-Excalibur ERP V2 was born from a real business need.
+Excalibur ERP was born from a real business need.
 
 For years, my family business operated with handwritten ledgers, manual calculations, and disconnected processes. That worked for a while, but it also created friction: low visibility, repetitive work, and a hard ceiling on operational clarity.
 
+This system reduced manual operational work and improved visibility into inventory and order workflows.
+
 This project is my attempt to turn that reality into a structured internal system.
 
-At its core, Excalibur ERP V2 is:
+At its core, Excalibur ERP is:
 
 - A practical ERP for managing customers, orders, and inventory in one place
 - A dashboard-oriented internal tool for day-to-day visibility
@@ -101,6 +103,23 @@ Current business capabilities include:
 - Render
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Architecture
+
+The system follows a typical split frontend-backend architecture:
+
+- Django REST API handles business logic, authentication, and data validation
+- React frontend consumes API endpoints and manages UI state
+- PostgreSQL stores relational data with transactional consistency
+- Docker is used for local development and environment consistency
+
+Core backend modules include:
+- Orders service (order lifecycle management)
+- Inventory service (stock tracking and movements)
+- Customers service (customer data and addresses)
+- Expenses module
+
+
 
 ## Getting Started
 
@@ -229,6 +248,7 @@ In this setup:
 - [x] Dashboard metrics and stock visibility
 - [x] Customers, orders, inventory, and expenses modules
 - [x] Render-ready login hardening with shared cache support
+- [ ] Cashflow, payments module and billing.
 - [ ] Seed/demo data command for faster setup
 - [ ] Expanded automated coverage across services and API workflows
 

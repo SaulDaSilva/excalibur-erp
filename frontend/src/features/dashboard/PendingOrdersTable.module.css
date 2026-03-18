@@ -1,9 +1,9 @@
 .loadingTitle {
-  @apply text-lg font-semibold text-slate-900;
+  @apply text-lg font-semibold text-stone-900;
 }
 
 .loadingText {
-  @apply mt-3 text-sm text-slate-600;
+  @apply mt-3 text-sm text-stone-500;
 }
 
 .card {
@@ -11,11 +11,11 @@
 }
 
 .header {
-  @apply flex items-center justify-between border-b border-slate-200 px-4 py-3 md:px-5;
+  @apply flex items-center justify-between border-b border-stone-200 px-5 py-4;
 }
 
 .title {
-  @apply text-lg font-semibold text-slate-900;
+  @apply text-base font-semibold text-stone-900;
 }
 
 .tableCard {
@@ -26,54 +26,14 @@
   @apply h-[28rem];
 }
 
-.table {
-  @apply min-w-full text-sm;
-}
-
-.head {
-  @apply sticky top-0 z-10 bg-slate-50 text-slate-600;
-}
-
-.cell {
-  @apply px-4 py-3 text-center align-middle font-medium md:px-5;
-}
-
-.cellRight {
-  @apply px-4 py-3 text-center align-middle font-medium md:px-5;
-}
-
-.body {
-  @apply divide-y divide-slate-200;
-}
-
 .empty {
-  @apply px-4 py-4 text-center text-slate-500 md:px-5;
+  @apply px-5 py-6 text-center text-stone-500;
 }
 
-.row {
-  @apply hover:bg-slate-50;
-}
-
-.bodyCell {
-  @apply px-4 py-3 text-center align-middle md:px-5;
-}
-
-.summaryCell {
-  @apply px-4 py-3 text-center align-middle text-slate-700 md:px-5;
-}
-
-.actionCell {
-  @apply px-4 py-3 text-center align-middle md:px-5;
-}
-
-.customerName {
-  @apply font-medium text-slate-900;
-}
-
-.customerMeta {
-  @apply text-xs text-slate-500;
+.itemsCell {
+  @apply min-w-[15rem];
 }
 
 .actionLink {
-  @apply inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 shadow-sm hover:bg-slate-50;
+  @apply inline-flex items-center justify-center rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm font-medium text-stone-900 shadow-sm hover:bg-stone-50;
 }

@@ -10,6 +10,7 @@ import { ClienteForm } from "../features/clientes/ClienteForm";
 import {
   useCliente,
   useCreateCliente,
+  useCreatePais,
   useCreateDireccion,
   useDeleteDireccion,
   useDirecciones,
@@ -22,6 +23,7 @@ import type {
   ClienteFormSubmitPayload,
   ClienteUpdateInput,
   DireccionDraft,
+  Pais,
 } from "../features/clientes/types";
 import {
   CUSTOMER_FIELDS,
@@ -63,6 +65,7 @@ export function ClienteFormPage({ mode }: ClienteFormPageProps) {
   const direccionesQuery = useDirecciones(mode === "edit" && hasValidClienteId ? clienteId : null);
 
   const createCliente = useCreateCliente();
+  const createPais = useCreatePais();
   const updateCliente = useUpdateCliente();
   const createDireccion = useCreateDireccion();
   const updateDireccion = useUpdateDireccion();
@@ -90,6 +93,16 @@ export function ClienteFormPage({ mode }: ClienteFormPageProps) {
       await queryClient.invalidateQueries({ queryKey: ["cliente", id] });
       await queryClient.invalidateQueries({ queryKey: ["direcciones", id] });
     }
+  };
+
+  const handleCreatePais = async (payload: { name: string; iso_code: string }): Promise<Pais> => {
+    const created = await createPais.mutateAsync(payload);
+    queryClient.setQueryData<Pais[]>(["paises"], (previous) => {
+      const next = [...(previous ?? []), created];
+      return next.sort((left, right) => left.name.localeCompare(right.name, "es"));
+    });
+    await queryClient.invalidateQueries({ queryKey: ["paises"] });
+    return created;
   };
 
   const handleSubmit = async ({ customer, addresses }: ClienteFormSubmitPayload) => {
@@ -187,6 +200,7 @@ export function ClienteFormPage({ mode }: ClienteFormPageProps) {
             initialData={clienteQuery.data ?? null}
             initialAddresses={initialAddresses}
             paises={paisesQuery.data ?? []}
+            onCreatePais={handleCreatePais}
             onSubmit={handleSubmit}
             onCancel={() => navigate("/clientes")}
           />

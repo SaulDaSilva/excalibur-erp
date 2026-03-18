@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
   createCliente,
+  createPais,
   createDireccion,
   deleteCliente,
   deleteDireccion,
@@ -18,6 +19,7 @@ import type {
   ClienteUpdateInput,
   DireccionCreateInput,
   DireccionUpdateInput,
+  PaisCreateInput,
 } from "./types";
 
 export function useClientes({ page, pageSize, q, includeInactive }: ClientesListParams) {
@@ -54,6 +56,12 @@ export function useDirecciones(customerId: number | null) {
 export function useCreateCliente() {
   return useMutation({
     mutationFn: (data: ClienteCreateInput) => createCliente(data),
+  });
+}
+
+export function useCreatePais() {
+  return useMutation({
+    mutationFn: (data: PaisCreateInput) => createPais(data),
   });
 }
 

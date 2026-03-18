@@ -1,3 +1,15 @@
+.brandPanel {
+  @apply w-full overflow-hidden rounded-2xl border border-stone-200 bg-[linear-gradient(180deg,_#ffffff_0%,_#f7f5f2_100%)] p-3 shadow-[0_12px_30px_rgba(28,25,23,0.08)];
+}
+
+.brand {
+  @apply flex w-full;
+}
+
+.brandLogo {
+  @apply block h-auto w-full rounded-xl object-cover drop-shadow-[0_10px_24px_rgba(28,25,23,0.12)];
+}
+
 .form {
   @apply space-y-6;
 }

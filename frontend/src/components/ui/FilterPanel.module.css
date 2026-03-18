@@ -1,5 +1,5 @@
 .panel {
-  @apply space-y-4;
+  @apply space-y-5;
 }
 
 .header {
@@ -7,11 +7,11 @@
 }
 
 .title {
-  @apply text-sm font-semibold text-slate-900;
+  @apply text-sm font-semibold uppercase tracking-[0.12em] text-stone-500;
 }
 
 .subtitle {
-  @apply mt-1 text-sm text-slate-600;
+  @apply mt-2 text-sm text-stone-500;
 }
 
 .filterGrid {
@@ -23,9 +23,9 @@
 }
 
 .checkbox {
-  @apply flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700;
+  @apply flex items-center gap-2 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2.5 text-sm font-medium text-stone-700 shadow-sm;
 }
 
 .checkboxInput {
-  @apply h-4 w-4 rounded border-slate-300;
+  @apply h-4 w-4 rounded border-stone-300;
 }

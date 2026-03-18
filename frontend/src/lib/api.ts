@@ -1,6 +1,12 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ??
-  (import.meta.env.PROD ? "" : "http://localhost:8000");
+function normalizeApiBaseUrl(value: string | undefined): string {
+  if (!value) {
+    return "";
+  }
+
+  return value.endsWith("/") ? value.slice(0, -1) : value;
+}
+
+const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 const UNSAFE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 let csrfTokenOverride: string | null = null;

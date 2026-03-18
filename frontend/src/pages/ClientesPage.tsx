@@ -52,7 +52,7 @@ export function ClientesPage() {
   };
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-6">
       <PageHeader
         actions={
           <Button

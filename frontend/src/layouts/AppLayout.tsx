@@ -32,18 +32,18 @@ export function AppLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 md:flex">
+    <div className="min-h-screen bg-stone-50">
       <Sidebar onLogout={handleLogout} isLoggingOut={isLoggingOut} />
 
-      <div className="flex min-h-screen flex-1 flex-col bg-slate-50 text-slate-900">
+      <div className="flex min-h-screen flex-1 flex-col bg-stone-50 text-stone-900 md:ml-64">
         <TopBar />
         {errorMessage && (
-          <div className="px-4 pt-4 md:px-6">
+          <div className="px-4 pt-4 md:px-8">
             <Notice variant="error" message={errorMessage} />
           </div>
         )}
 
-        <main className="flex-1 p-4 md:p-6">
+        <main className="flex-1 p-4 md:p-8">
           <Container>
             <Outlet />
           </Container>

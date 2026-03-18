@@ -1,6 +1,7 @@
 import styles from "../../components/ui/DataTable.module.css";
 import { Notice } from "../../components/ui/Notice";
 import { PaginationControls } from "../../components/ui/PaginationControls";
+import { StatusBadge } from "../../components/ui/StatusBadge";
 import { TableCard } from "../../components/ui/TableCard";
 import type { PaginatedResponse } from "../clientes/types";
 import type { StockByVariantRow } from "./types";
@@ -12,6 +13,10 @@ type StockTableProps = {
   onPageChange: (nextPage: number) => void;
   loading: boolean;
 };
+
+function getStockVariant(stockPairs: number): "success" | "error" {
+  return stockPairs > 0 ? "success" : "error";
+}
 
 export function StockTable({ data, page, pageSize, onPageChange, loading }: StockTableProps) {
   const rows = data?.results ?? [];
@@ -31,7 +36,7 @@ export function StockTable({ data, page, pageSize, onPageChange, loading }: Stoc
                 <th className={styles.th}>Producto</th>
                 <th className={styles.th}>Medida</th>
                 <th className={styles.th}>Stock</th>
-                <th className={styles.th}>Activo</th>
+                <th className={styles.th}>Estado</th>
               </tr>
             </thead>
             <tbody className={styles.body}>
@@ -44,8 +49,18 @@ export function StockTable({ data, page, pageSize, onPageChange, loading }: Stoc
                     </div>
                   </td>
                   <td className={styles.td}>{row.measure_mm}mm</td>
-                  <td className={styles.td}>{row.stock_pairs}</td>
-                  <td className={styles.td}>{row.is_active ? "Si" : "No"}</td>
+                  <td className={styles.td}>
+                    <div className={styles.cellStack}>
+                      <p className={styles.primaryText}>{row.stock_pairs} pares</p>
+                      <StatusBadge
+                        label={row.stock_pairs > 0 ? "Disponible" : "Sin stock"}
+                        variant={getStockVariant(row.stock_pairs)}
+                      />
+                    </div>
+                  </td>
+                  <td className={styles.td}>
+                    <StatusBadge label={row.is_active ? "Activa" : "Inactiva"} variant={row.is_active ? "success" : "neutral"} />
+                  </td>
                 </tr>
               ))}
             </tbody>

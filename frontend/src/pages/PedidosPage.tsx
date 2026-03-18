@@ -79,7 +79,7 @@ export function PedidosPage() {
   };
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-6">
       <PageHeader
         actions={
           <Button type="button" variant="primary" onClick={() => navigate("/pedidos/nuevo")}>

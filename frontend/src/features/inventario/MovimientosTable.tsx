@@ -1,6 +1,7 @@
 import styles from "../../components/ui/DataTable.module.css";
 import { Notice } from "../../components/ui/Notice";
 import { PaginationControls } from "../../components/ui/PaginationControls";
+import { StatusBadge } from "../../components/ui/StatusBadge";
 import { TableCard } from "../../components/ui/TableCard";
 import type { PaginatedResponse } from "../clientes/types";
 import type { InventoryMovementRow } from "./types";
@@ -15,6 +16,29 @@ function getMovementTypeLabel(movementType: InventoryMovementRow["movement_type"
     REVERSAL_PROMO: "Reversion promocion",
   };
   return labels[movementType] ?? movementType;
+}
+
+function getMovementVariant(movementType: InventoryMovementRow["movement_type"]): "success" | "warning" | "error" | "info" | "neutral" {
+  const variants: Record<string, "success" | "warning" | "error" | "info" | "neutral"> = {
+    PRODUCTION: "success",
+    ADJUSTMENT: "warning",
+    SALE: "info",
+    PROMO: "neutral",
+    REVERSAL_SALE: "success",
+    REVERSAL_PROMO: "success",
+  };
+  return variants[movementType] ?? "neutral";
+}
+
+function formatMovementDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return new Intl.DateTimeFormat("es-EC", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
 }
 
 type MovimientosTableProps = {
@@ -50,9 +74,15 @@ export function MovimientosTable({ data, page, pageSize, onPageChange, loading }
             <tbody className={styles.body}>
               {rows.map((row) => (
                 <tr key={row.id} className={styles.row}>
-                  <td className={styles.td}>{new Date(row.created_at).toLocaleString()}</td>
-                  <td className={styles.td}>{getMovementTypeLabel(row.movement_type)}</td>
-                  <td className={styles.td}>{row.quantity_pairs}</td>
+                  <td className={styles.td}>{formatMovementDate(row.created_at)}</td>
+                  <td className={styles.td}>
+                    <StatusBadge label={getMovementTypeLabel(row.movement_type)} variant={getMovementVariant(row.movement_type)} />
+                  </td>
+                  <td className={styles.td}>
+                    <span className={row.quantity_pairs >= 0 ? "font-medium text-emerald-700" : "font-medium text-rose-700"}>
+                      {row.quantity_pairs}
+                    </span>
+                  </td>
                   <td className={styles.td}>
                     <div className={styles.cellStack}>
                       <p className={styles.primaryText}>{row.product_variant.product}</p>

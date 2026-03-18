@@ -11,7 +11,7 @@ type TableCardProps = {
 export function TableCard({
   children,
   className = "",
-  scrollAreaClassName = "h-[30rem]",
+  scrollAreaClassName = "h-[28rem]",
 }: TableCardProps) {
   return (
     <Card className={`overflow-hidden p-0 ${className}`}>

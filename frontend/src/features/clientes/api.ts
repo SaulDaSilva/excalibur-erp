@@ -10,6 +10,7 @@ import type {
   ClienteUpdateInput,
   PaginatedResponse,
   Pais,
+  PaisCreateInput,
 } from "./types";
 
 export function listClientes(params: ClientesListParams): Promise<PaginatedResponse<Cliente>> {
@@ -35,6 +36,10 @@ export function deleteCliente(id: number): Promise<null> {
 
 export function listPaises(): Promise<Pais[]> {
   return apiGet<Pais[]>("/api/clientes/paises/");
+}
+
+export function createPais(data: PaisCreateInput): Promise<Pais> {
+  return apiPost<Pais>("/api/clientes/paises/", data);
 }
 
 export function listClientesForSelect(): Promise<PaginatedResponse<Cliente>> {

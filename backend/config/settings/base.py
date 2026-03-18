@@ -1,3 +1,4 @@
+import dj_database_url
 from pathlib import Path
 import os
 import environ
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     "apps.pedidos",
     "apps.inventario",
     "apps.catalogo",
+    "apps.gastos",
     "apps.users",
     "apps.core",
 
@@ -137,6 +139,22 @@ if SERVE_FRONTEND and FRONTEND_DIST_DIR.exists():
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+cache_url = env("DJANGO_CACHE_URL", default="")
+if cache_url:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": cache_url,
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "excalibur-erp-local-cache",
+        }
+    }
+
 # DRF: session auth + locked down by default
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -145,10 +163,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
-    "DEFAULT_THROTTLE_RATES": {
-        "login": env("DRF_LOGIN_THROTTLE_RATE", default="5/min"),
-    },
 }
+
+AUTH_IP_THROTTLE_MINUTE = env("AUTH_IP_THROTTLE_MINUTE", default="5/min")
+AUTH_IP_THROTTLE_HOUR = env("AUTH_IP_THROTTLE_HOUR", default="30/hour")
+AUTH_USER_IP_THROTTLE_WINDOW = env("AUTH_USER_IP_THROTTLE_WINDOW", default="5/15min")
+AUTH_USER_IP_THROTTLE_DAY = env("AUTH_USER_IP_THROTTLE_DAY", default="20/day")
+AUTH_LOCKOUT_THRESHOLD = env.int("AUTH_LOCKOUT_THRESHOLD", default=8)
+AUTH_LOCKOUT_SECONDS = env.int("AUTH_LOCKOUT_SECONDS", default=900)
 
 # CORS / CSRF for Vite dev server
 CORS_ALLOWED_ORIGINS = [o.strip() for o in env("CORS_ALLOWED_ORIGINS", default="").split(",") if o.strip()]

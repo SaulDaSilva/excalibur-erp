@@ -2,13 +2,13 @@ from django.urls import path
 from apps.clientes.api.views import (
     AddressDetailAPIView,
     AddressListCreateAPIView,
-    CountryListAPIView,
+    CountryListCreateAPIView,
     CustomerDetailAPIView,
     CustomerListCreateAPIView,
 )
 
 urlpatterns = [
-    path("paises/", CountryListAPIView.as_view(), name="clientes-country-list"),
+    path("paises/", CountryListCreateAPIView.as_view(), name="clientes-country-list-create"),
     path("", CustomerListCreateAPIView.as_view(), name="clientes-customer-list-create"),
     path("<int:pk>/", CustomerDetailAPIView.as_view(), name="clientes-customer-detail"),
     path(

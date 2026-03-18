@@ -1,5 +1,5 @@
 .root {
-  @apply xl:col-span-2;
+  @apply flex h-full min-h-[15rem] flex-col xl:col-span-2;
 }
 
 .header {
@@ -7,23 +7,41 @@
 }
 
 .title {
-  @apply text-base text-slate-600;
+  @apply text-base font-semibold text-stone-900;
 }
 
 .subtitle {
-  @apply mt-1 text-xs text-slate-500;
+  @apply mt-1 text-sm text-stone-500;
 }
 
 .feedback {
-  @apply mt-4 text-sm text-slate-600;
+  @apply mt-6 flex flex-1 items-center justify-center text-center text-sm text-stone-500;
 }
 
 .list {
-  @apply mt-4 space-y-2;
+  @apply mt-6 flex flex-col gap-3 overflow-y-auto pr-2;
+  max-height: min(24rem, 55vh);
+  scrollbar-gutter: stable;
+}
+
+.list::-webkit-scrollbar {
+  width: 0.55rem;
+}
+
+.list::-webkit-scrollbar-track {
+  @apply rounded-full bg-stone-100;
+}
+
+.list::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-stone-300;
+}
+
+.list::-webkit-scrollbar-thumb:hover {
+  @apply bg-stone-400;
 }
 
 .row {
-  @apply flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2;
+  @apply flex items-center justify-between gap-4 rounded-xl border border-stone-200 bg-stone-50 px-4 py-3;
 }
 
 .info {
@@ -31,11 +49,15 @@
 }
 
 .name {
-  @apply truncate text-sm font-medium text-slate-900;
+  @apply truncate text-sm font-medium text-stone-900;
 }
 
 .meta {
-  @apply text-xs text-slate-500;
+  @apply mt-1 text-xs text-stone-500;
+}
+
+.stockBlock {
+  @apply flex items-center gap-4;
 }
 
 .stock {
@@ -43,9 +65,9 @@
 }
 
 .stockValue {
-  @apply text-lg font-semibold text-slate-900;
+  @apply text-xl font-semibold text-stone-900;
 }
 
 .stockLabel {
-  @apply text-lg text-slate-500;
+  @apply text-xs uppercase tracking-[0.12em] text-stone-500;
 }

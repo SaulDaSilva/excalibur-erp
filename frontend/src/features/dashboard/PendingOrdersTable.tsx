@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { Card } from "../../components/ui/Card";
+import tableStyles from "../../components/ui/DataTable.module.css";
 import { TableCard } from "../../components/ui/TableCard";
 import { PedidoItemsBadges } from "../pedidos/PedidoItemsBadges";
 import { formatCurrencyUSD, formatDateTime } from "./formatters";
@@ -39,19 +40,19 @@ export function PendingOrdersTable({ orders, loading = false }: PendingOrdersTab
       </div>
 
       <TableCard className={styles.tableCard} scrollAreaClassName={styles.scrollArea}>
-        <table className={styles.table}>
-          <thead className={styles.head}>
+        <table className={tableStyles.table}>
+          <thead className={tableStyles.head}>
             <tr>
-              <th className={styles.cell}>Pedido</th>
-              <th className={styles.cell}>Cliente</th>
-              <th className={styles.cell}>Fecha</th>
-              <th className={styles.cell}>Canal</th>
-              <th className={styles.cell}>Items</th>
-              <th className={styles.cell}>Total venta</th>
-              <th className={styles.cellRight}>Acciones</th>
+              <th className={tableStyles.th}>Pedido</th>
+              <th className={tableStyles.th}>Cliente</th>
+              <th className={tableStyles.th}>Fecha</th>
+              <th className={tableStyles.th}>Canal</th>
+              <th className={tableStyles.th}>Items</th>
+              <th className={tableStyles.th}>Total venta</th>
+              <th className={tableStyles.thRight}>Acciones</th>
             </tr>
           </thead>
-          <tbody className={styles.body}>
+          <tbody className={tableStyles.body}>
             {orders.length === 0 && (
               <tr>
                 <td className={styles.empty} colSpan={7}>
@@ -60,21 +61,23 @@ export function PendingOrdersTable({ orders, loading = false }: PendingOrdersTab
               </tr>
             )}
             {orders.map((order) => (
-              <tr key={order.id} className={styles.row}>
-                <td className={styles.bodyCell}>#{order.id}</td>
-                <td className={styles.bodyCell}>
-                  <p className={styles.customerName}>
-                    {order.customer.first_name} {order.customer.last_name}
-                  </p>
-                  <p className={styles.customerMeta}>{order.customer.id_number}</p>
+              <tr key={order.id} className={tableStyles.row}>
+                <td className={tableStyles.td}>#{order.id}</td>
+                <td className={tableStyles.td}>
+                  <div className={tableStyles.cellStack}>
+                    <p className={tableStyles.primaryText}>
+                      {order.customer.first_name} {order.customer.last_name}
+                    </p>
+                    <p className={tableStyles.secondaryText}>{order.customer.id_number}</p>
+                  </div>
                 </td>
-                <td className={styles.bodyCell}>{formatDateTime(order.created_at)}</td>
-                <td className={styles.bodyCell}>{getChannelLabel(order.channel)}</td>
-                <td className={styles.summaryCell}>
+                <td className={tableStyles.td}>{formatDateTime(order.created_at)}</td>
+                <td className={tableStyles.td}>{getChannelLabel(order.channel)}</td>
+                <td className={`${tableStyles.td} ${styles.itemsCell}`}>
                   <PedidoItemsBadges items={order.items} maxVisible={3} stacked />
                 </td>
-                <td className={styles.bodyCell}>{formatCurrencyUSD(order.sold_amount_usd)}</td>
-                <td className={styles.actionCell}>
+                <td className={tableStyles.td}>{formatCurrencyUSD(order.sold_amount_usd)}</td>
+                <td className={tableStyles.tdRight}>
                   <Link className={styles.actionLink} to={`/pedidos/${order.id}`}>
                     Ver detalle
                   </Link>

@@ -11,6 +11,7 @@ urlpatterns = [
     path("api/pedidos/", include("apps.pedidos.api.urls")),
     path("api/inventario/", include("apps.inventario.api.urls")),
     path("api/catalogo/", include("apps.catalogo.api.urls")),
+    path("api/gastos/", include("apps.gastos.api.urls")),
 ]
 
 if settings.ENABLE_ADMIN:

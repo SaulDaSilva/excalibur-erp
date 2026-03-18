@@ -1,4 +1,5 @@
-import { Card } from "../../components/ui/Card";
+import { StatCard } from "../../components/ui/StatCard";
+import { StatusBadge } from "../../components/ui/StatusBadge";
 import { formatCurrencyUSD } from "./formatters";
 import type { Metrics } from "./types";
 import styles from "./MetricCards.module.css";
@@ -9,41 +10,33 @@ type MetricCardsProps = {
 };
 
 export function MetricCards({ metrics, loading = false }: MetricCardsProps) {
-  const cards = [
-    {
-      label: "Pedidos pendientes",
-      value: loading ? "Cargando..." : String(metrics?.pending_orders_count ?? 0),
-    },
-    {
-      label: "Ventas ultimos 7 dias (USD)",
-      value: loading ? "Cargando..." : formatCurrencyUSD(metrics?.sales_last_7_days_usd ?? "0.00"),
-    },
-  ];
+  const totalPairs = (metrics?.sold_pairs_last_7_days ?? 0) + (metrics?.promo_pairs_last_7_days ?? 0);
 
   return (
-    <>
-      {cards.map((card) => (
-        <Card key={card.label} className={styles.card}>
-          <p className={styles.label}>{card.label}</p>
-          <p className={styles.value}>{card.value}</p>
-        </Card>
-      ))}
-
-      <Card className={styles.card}>
-        <p className={styles.label}>Pares vendidos ultimos 7 dias</p>
-        {loading ? (
-          <p className={styles.value}>Cargando...</p>
-        ) : (
-          <div className={styles.badges}>
-            <span className={`${styles.badge} ${styles.saleBadge}`}>
-              Venta: {metrics?.sold_pairs_last_7_days ?? 0}
-            </span>
-            <span className={`${styles.badge} ${styles.promoBadge}`}>
-              Promocion: {metrics?.promo_pairs_last_7_days ?? 0}
-            </span>
-          </div>
-        )}
-      </Card>
-    </>
+    <div className="grid gap-6 md:grid-cols-2 xl:col-span-3 xl:grid-cols-3">
+      <StatCard
+        title="Pedidos pendientes"
+        value={loading ? "Cargando..." : String(metrics?.pending_orders_count ?? 0)}
+        accent="PP"
+      />
+      <StatCard
+        title="Ventas ultimos 7 dias (USD)"
+        value={loading ? "Cargando..." : formatCurrencyUSD(metrics?.sales_last_7_days_usd ?? "0.00")}
+        accent="USD"
+      />
+      <StatCard
+        title="Pares vendidos ultimos 7 dias"
+        value={loading ? "Cargando..." : totalPairs}
+        accent="7D"
+        helper={
+          !loading && (
+            <div className={styles.helper}>
+              <StatusBadge label={`Venta ${metrics?.sold_pairs_last_7_days ?? 0}`} variant="info" />
+              <StatusBadge label={`Promocion ${metrics?.promo_pairs_last_7_days ?? 0}`} variant="warning" />
+            </div>
+          )
+        }
+      />
+    </div>
   );
 }

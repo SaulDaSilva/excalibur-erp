@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import formStyles from "../../components/ui/FormLayout.module.css";
+import brandLogo from "../../assets/img/logotipo_marca.png";
 import { toApiError } from "../../lib/api";
 import { getCsrf, login } from "./api";
 
@@ -75,32 +76,42 @@ export function LoginPage() {
   return (
     <main className="mx-auto mt-16 w-full max-w-md px-4">
       <Card className="space-y-6">
-        <div className={formStyles.intro}>
-          <p className={formStyles.introTitle}>Iniciar sesion</p>
-          <p className={formStyles.introText}>Accede con tus credenciales internas para entrar al ERP.</p>
+        <div className={formStyles.brand}>
+          <div className={formStyles.brandPanel}>
+            <img
+              src={brandLogo}
+              alt="Excalibur ERP V2"
+              className={formStyles.brandLogo}
+            />
+          </div>
         </div>
 
-        <form onSubmit={onSubmit} className={formStyles.form}>
-          <div className={formStyles.field}>
-            <label htmlFor="username">Usuario</label>
-            <input id="username" type="text" {...register("username")} />
-            {errors.username && <p className={formStyles.errorText}>{errors.username.message}</p>}
+          <div className={formStyles.intro}>
+            <p className={formStyles.introTitle}>Iniciar sesion</p>
+            <p className={formStyles.introText}>Accede con tus credenciales internas para entrar al ERP.</p>
           </div>
 
-          <div className={formStyles.field}>
-            <label htmlFor="password">Contrasena</label>
-            <input id="password" type="password" {...register("password")} />
-            {errors.password && <p className={formStyles.errorText}>{errors.password.message}</p>}
-          </div>
+          <form onSubmit={onSubmit} className={formStyles.form}>
+            <div className={formStyles.field}>
+              <label htmlFor="username">Usuario</label>
+              <input id="username" type="text" autoComplete="username" {...register("username")} />
+              {errors.username && <p className={formStyles.errorText}>{errors.username.message}</p>}
+            </div>
 
-          {errorMessage && <p className={formStyles.errorBox}>{errorMessage}</p>}
+            <div className={formStyles.field}>
+              <label htmlFor="password">Contrasena</label>
+              <input id="password" type="password" autoComplete="current-password" {...register("password")} />
+              {errors.password && <p className={formStyles.errorText}>{errors.password.message}</p>}
+            </div>
 
-          <div className={formStyles.actions}>
-            <Button type="submit" variant="primary" disabled={isSubmitting || !isCsrfReady}>
-              {isSubmitting ? "Ingresando..." : "Ingresar"}
-            </Button>
-          </div>
-        </form>
+            {errorMessage && <p className={formStyles.errorBox}>{errorMessage}</p>}
+
+            <div className={formStyles.actions}>
+              <Button type="submit" variant="primary" disabled={isSubmitting || !isCsrfReady}>
+                {isSubmitting ? "Ingresando..." : "Ingresar"}
+              </Button>
+            </div>
+          </form>
       </Card>
     </main>
   );

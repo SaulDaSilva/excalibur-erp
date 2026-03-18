@@ -14,8 +14,9 @@ import type {
   DireccionDraft,
   DireccionFieldName,
   Pais,
+  PaisCreateInput,
 } from "./types";
-import { ensurePrimaryAddress, isClienteFormSubmissionError } from "./utils";
+import { ensurePrimaryAddress, extractApiValidation, isClienteFormSubmissionError } from "./utils";
 
 type ClienteFormValues = {
   first_name: string;
@@ -31,6 +32,7 @@ type ClienteFormProps = {
   initialData: Cliente | null;
   initialAddresses?: DireccionDraft[];
   paises: Pais[];
+  onCreatePais: (data: PaisCreateInput) => Promise<Pais>;
   onSubmit: (data: ClienteFormSubmitPayload) => Promise<void>;
   onCancel: () => void;
 };
@@ -51,18 +53,33 @@ const addressSchema = z.object({
   address_line: z.string().trim(),
   is_primary: z.boolean(),
 });
+const countrySchema = z.object({
+  name: z.string().trim().min(1, "El nombre del pais es obligatorio."),
+  iso_code: z
+    .string()
+    .trim()
+    .min(2, "El codigo ISO debe tener al menos 2 caracteres.")
+    .max(3, "El codigo ISO no puede exceder 3 caracteres."),
+});
+const COUNTRY_FIELDS = ["name", "iso_code"] as const;
 
 export function ClienteForm({
   mode,
   initialData,
   initialAddresses = [],
   paises,
+  onCreatePais,
   onSubmit,
   onCancel,
 }: ClienteFormProps) {
   const [submitError, setSubmitError] = useState("");
   const [addresses, setAddresses] = useState<DireccionDraft[]>([]);
   const [addressErrors, setAddressErrors] = useState<Record<number, Partial<Record<DireccionFieldName, string>>>>({});
+  const [isCountryEditorOpen, setIsCountryEditorOpen] = useState(false);
+  const [countryDraft, setCountryDraft] = useState<PaisCreateInput>({ name: "", iso_code: "" });
+  const [countryFieldErrors, setCountryFieldErrors] = useState<Partial<Record<keyof PaisCreateInput, string>>>({});
+  const [countrySubmitError, setCountrySubmitError] = useState("");
+  const [isCreatingCountry, setIsCreatingCountry] = useState(false);
 
   const defaultValues = useMemo<ClienteFormValues>(
     () => ({
@@ -81,6 +98,7 @@ export function ClienteForm({
     handleSubmit,
     reset,
     setError,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ClienteFormValues>({ defaultValues });
 
@@ -93,6 +111,13 @@ export function ClienteForm({
     setAddresses(initialAddresses);
     setAddressErrors({});
   }, [initialAddresses]);
+
+  const resetCountryEditor = () => {
+    setCountryDraft({ name: "", iso_code: "" });
+    setCountryFieldErrors({});
+    setCountrySubmitError("");
+    setIsCountryEditorOpen(false);
+  };
 
   const updateAddress = (index: number, patch: Partial<DireccionDraft>) => {
     setAddresses((previous) => {
@@ -135,6 +160,40 @@ export function ClienteForm({
         is_primary: itemIndex === index,
       })),
     );
+  };
+
+  const handleCreateCountry = async () => {
+    setCountryFieldErrors({});
+    setCountrySubmitError("");
+
+    const parsed = countrySchema.safeParse(countryDraft);
+    if (!parsed.success) {
+      const nextErrors: Partial<Record<keyof PaisCreateInput, string>> = {};
+      for (const issue of parsed.error.issues) {
+        const fieldName = issue.path[0];
+        if (fieldName === "name" || fieldName === "iso_code") {
+          nextErrors[fieldName] = issue.message;
+        }
+      }
+      setCountryFieldErrors(nextErrors);
+      return;
+    }
+
+    setIsCreatingCountry(true);
+    try {
+      const created = await onCreatePais({
+        name: parsed.data.name,
+        iso_code: parsed.data.iso_code.toUpperCase(),
+      });
+      setValue("country", created.id, { shouldDirty: true, shouldValidate: true });
+      resetCountryEditor();
+    } catch (error) {
+      const { detail, fieldErrors } = extractApiValidation(error, COUNTRY_FIELDS);
+      setCountryFieldErrors(fieldErrors);
+      setCountrySubmitError(detail ?? "No se pudo crear el pais.");
+    } finally {
+      setIsCreatingCountry(false);
+    }
   };
 
   const submit = handleSubmit(async (values) => {
@@ -245,17 +304,89 @@ export function ClienteForm({
           {errors.id_number && <p className={formStyles.errorText}>{errors.id_number.message}</p>}
         </div>
 
-        <div className={formStyles.field}>
+        <div className={`${formStyles.field} ${formStyles.fieldFull}`}>
           <label htmlFor="country">Pais</label>
-          <select id="country" {...register("country", { valueAsNumber: true })}>
-            <option value={0}>Seleccione un pais</option>
-            {paises.map((pais) => (
-              <option key={pais.id} value={pais.id}>
-                {pais.name}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-col gap-3 md:flex-row md:items-end">
+            <div className="flex-1">
+              <select id="country" {...register("country", { valueAsNumber: true })}>
+                <option value={0}>Seleccione un pais</option>
+                {paises.map((pais) => (
+                  <option key={pais.id} value={pais.id}>
+                    {pais.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Button
+              type="button"
+              variant="secondary"
+              className="md:self-end"
+              onClick={() => {
+                setCountrySubmitError("");
+                setCountryFieldErrors({});
+                setIsCountryEditorOpen((current) => !current);
+              }}
+            >
+              {isCountryEditorOpen ? "Ocultar nuevo pais" : "Nuevo pais"}
+            </Button>
+          </div>
           {errors.country && <p className={formStyles.errorText}>{errors.country.message}</p>}
+
+          {isCountryEditorOpen && (
+            <div className={formStyles.section}>
+              <div>
+                <p className={formStyles.sectionTitle}>Crear pais</p>
+                <p className={formStyles.sectionText}>
+                  Agrega un pais al catalogo y quedara seleccionado automaticamente.
+                </p>
+              </div>
+
+              <div className={formStyles.formGrid}>
+                <div className={formStyles.field}>
+                  <label htmlFor="country_name_create">Nombre del pais</label>
+                  <input
+                    id="country_name_create"
+                    type="text"
+                    value={countryDraft.name}
+                    onChange={(event) =>
+                      setCountryDraft((previous) => ({ ...previous, name: event.target.value }))
+                    }
+                  />
+                  {countryFieldErrors.name && <p className={formStyles.errorText}>{countryFieldErrors.name}</p>}
+                </div>
+
+                <div className={formStyles.field}>
+                  <label htmlFor="country_iso_create">Codigo ISO</label>
+                  <input
+                    id="country_iso_create"
+                    type="text"
+                    maxLength={3}
+                    value={countryDraft.iso_code}
+                    onChange={(event) =>
+                      setCountryDraft((previous) => ({
+                        ...previous,
+                        iso_code: event.target.value.toUpperCase(),
+                      }))
+                    }
+                  />
+                  {countryFieldErrors.iso_code && (
+                    <p className={formStyles.errorText}>{countryFieldErrors.iso_code}</p>
+                  )}
+                </div>
+              </div>
+
+              {countrySubmitError && <p className={formStyles.errorBox}>{countrySubmitError}</p>}
+
+              <div className="flex flex-wrap justify-end gap-2">
+                <Button type="button" variant="secondary" onClick={resetCountryEditor} disabled={isCreatingCountry}>
+                  Cancelar
+                </Button>
+                <Button type="button" variant="primary" onClick={handleCreateCountry} disabled={isCreatingCountry}>
+                  {isCreatingCountry ? "Guardando pais..." : "Guardar pais"}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className={formStyles.field}>

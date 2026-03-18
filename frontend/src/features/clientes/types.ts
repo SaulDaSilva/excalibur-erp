@@ -19,6 +19,7 @@ export type Cliente = {
   email: string;
   phone: string;
   country: number;
+  country_name: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -51,6 +52,11 @@ export type ClienteCreateInput = {
   email: string;
   phone: string;
   country: number;
+};
+
+export type PaisCreateInput = {
+  name: string;
+  iso_code: string;
 };
 
 export type ClienteUpdateInput = {

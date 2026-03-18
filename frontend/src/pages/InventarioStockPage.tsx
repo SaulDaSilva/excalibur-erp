@@ -28,7 +28,7 @@ export function InventarioStockPage() {
   }, [stockSearch, onlyActive]);
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-6">
       <PageHeader subtitle="Consulta el stock actual por variante de producto." />
 
       <FilterPanel title="Filtros" subtitle="Busca stock por producto y limita el resultado a variantes activas si lo necesitas.">

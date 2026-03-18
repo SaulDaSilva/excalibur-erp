@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,25 +9,36 @@
     @apply box-border;
   }
 
+  html {
+    font-family: "Inter", sans-serif;
+  }
+
   body {
-    @apply m-0 min-w-[320px] bg-slate-100 text-slate-900 antialiased;
+    @apply m-0 min-w-[320px] bg-stone-50 text-stone-900 antialiased selection:bg-teal-100 selection:text-teal-900;
   }
 
   a {
     @apply no-underline;
   }
 
+  button,
   input,
   select,
   textarea {
-    @apply rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10;
+    font: inherit;
+  }
+
+  input,
+  select,
+  textarea {
+    @apply w-full rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20;
   }
 
   label {
-    @apply text-sm font-medium text-slate-700;
+    @apply text-sm font-medium text-stone-700;
   }
 
   hr {
-    @apply my-6 border-slate-200;
+    @apply my-6 border-stone-200;
   }
 }

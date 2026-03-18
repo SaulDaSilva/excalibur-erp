@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from apps.core.models import TimeStampedModel, SoftDeleteModel
 from apps.core.validators import validate_ec_id
@@ -25,7 +26,6 @@ class Customer(TimeStampedModel, SoftDeleteModel):
         unique=True,
         verbose_name="Cédula / RUC",
         help_text="Cédula: 10 dígitos | RUC (persona natural): 13 dígitos (solo números)",
-        validators=[validate_ec_id],
     )
 
     email = models.EmailField(blank=True, default="", verbose_name="Correo Electrónico")
@@ -50,6 +50,24 @@ class Customer(TimeStampedModel, SoftDeleteModel):
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
+
+    def clean(self):
+        super().clean()
+
+        if self._requires_ec_id_validation():
+            try:
+                validate_ec_id(self.id_number)
+            except ValidationError as exc:
+                raise ValidationError({"id_number": exc.messages}) from exc
+
+    def _requires_ec_id_validation(self) -> bool:
+        if not self.country_id:
+            return False
+
+        country = self.country
+        iso_code = (country.iso_code or "").strip().upper()
+        name = (country.name or "").strip().lower()
+        return iso_code in {"EC", "ECU"} or name == "ecuador"
 
 
 class Address(TimeStampedModel):

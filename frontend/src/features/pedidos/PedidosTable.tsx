@@ -1,6 +1,7 @@
 import { Button } from "../../components/ui/Button";
 import styles from "../../components/ui/DataTable.module.css";
 import { Notice } from "../../components/ui/Notice";
+import { StatusBadge } from "../../components/ui/StatusBadge";
 import { TableCard } from "../../components/ui/TableCard";
 import { formatPedidoCurrency, formatPedidoDateTime, formatPedidoStatus } from "./formatters";
 import { PedidoItemsBadges } from "./PedidoItemsBadges";
@@ -13,6 +14,16 @@ type PedidosTableProps = {
   onCancel: (pedido: Pedido) => void;
   onDelete: (pedido: Pedido) => void;
 };
+
+function getStatusVariant(status: Pedido["status"]): "success" | "warning" | "error" {
+  if (status === "DISPATCHED") {
+    return "success";
+  }
+  if (status === "CANCELLED") {
+    return "error";
+  }
+  return "warning";
+}
 
 export function PedidosTable({ data, onView, onDispatch, onCancel, onDelete }: PedidosTableProps) {
   if (data.length === 0) {
@@ -33,7 +44,7 @@ export function PedidosTable({ data, onView, onDispatch, onCancel, onDelete }: P
             <th className={styles.th}>Items</th>
             <th className={styles.th}>Total pares</th>
             <th className={styles.th}>Total venta</th>
-            <th className={styles.th}>Acciones</th>
+            <th className={styles.thRight}>Acciones</th>
           </tr>
         </thead>
         <tbody className={styles.body}>
@@ -46,15 +57,18 @@ export function PedidosTable({ data, onView, onDispatch, onCancel, onDelete }: P
                   <p className={styles.primaryText}>
                     {pedido.customer.first_name} {pedido.customer.last_name}
                   </p>
+                  <p className={styles.secondaryText}>{pedido.customer.id_number}</p>
                 </div>
               </td>
-              <td className={styles.td}>{formatPedidoStatus(pedido.status)}</td>
+              <td className={styles.td}>
+                <StatusBadge label={formatPedidoStatus(pedido.status)} variant={getStatusVariant(pedido.status)} />
+              </td>
               <td className={styles.td}>
                 <PedidoItemsBadges items={pedido.items} />
               </td>
               <td className={styles.td}>{pedido.total_pairs ?? "-"}</td>
               <td className={styles.td}>{formatPedidoCurrency(pedido.sold_amount)}</td>
-              <td className={styles.td}>
+              <td className={styles.tdRight}>
                 <div className={styles.actions}>
                   <Button type="button" size="sm" onClick={() => onView(pedido)}>
                     Ver detalle
@@ -65,7 +79,7 @@ export function PedidosTable({ data, onView, onDispatch, onCancel, onDelete }: P
                     </Button>
                   )}
                   {pedido.status !== "CANCELLED" && (
-                    <Button type="button" size="sm" onClick={() => onCancel(pedido)}>
+                    <Button type="button" size="sm" variant="secondary" onClick={() => onCancel(pedido)}>
                       Cancelar
                     </Button>
                   )}

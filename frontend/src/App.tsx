@@ -6,6 +6,8 @@ import { AppLayout } from "./layouts/AppLayout";
 import { ClienteFormPage } from "./pages/ClienteFormPage";
 import { ClientesPage } from "./pages/ClientesPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { GastoFormPage } from "./pages/GastoFormPage";
+import { GastosPage } from "./pages/GastosPage";
 import { InventarioMovimientosPage } from "./pages/InventarioMovimientosPage";
 import { InventarioMovimientoNuevoPage } from "./pages/InventarioMovimientoNuevoPage";
 import { InventarioStockPage } from "./pages/InventarioStockPage";
@@ -32,6 +34,9 @@ function App() {
           <Route path="inventario/stock" element={<InventarioStockPage />} />
           <Route path="inventario/movimientos" element={<InventarioMovimientosPage />} />
           <Route path="inventario/nuevo-movimiento" element={<InventarioMovimientoNuevoPage />} />
+          <Route path="gastos" element={<GastosPage />} />
+          <Route path="gastos/nuevo" element={<GastoFormPage mode="create" />} />
+          <Route path="gastos/:gastoId/editar" element={<GastoFormPage mode="edit" />} />
         </Route>
       </Route>
 

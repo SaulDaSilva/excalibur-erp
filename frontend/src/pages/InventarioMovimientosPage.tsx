@@ -39,7 +39,7 @@ export function InventarioMovimientosPage() {
   }, [movementFilters]);
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-6">
       <PageHeader
         subtitle="Revise el historial de movimientos y cree ajustes manuales."
         actions={

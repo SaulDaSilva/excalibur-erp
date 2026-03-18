@@ -1,4 +1,5 @@
 import { Card } from "../../components/ui/Card";
+import { StatusBadge } from "../../components/ui/StatusBadge";
 import type { DashboardStockVariant } from "./types";
 import styles from "./StockByVariantCard.module.css";
 
@@ -28,13 +29,15 @@ export function StockByVariantCard({ rows = [], loading = false }: StockByVarian
           {rows.map((row) => (
             <div key={row.product_variant_id} className={styles.row}>
               <div className={styles.info}>
-                <p className={styles.name}>
-                  {row.product_name} {row.measure_mm}mm
-                </p>
+                <p className={styles.name}>{row.product_name}</p>
+                <p className={styles.meta}>Variante #{row.product_variant_id} - {row.measure_mm}mm</p>
               </div>
-              <div className={styles.stock}>
-                <p className={styles.stockValue}>{row.stock_pairs}</p>
-                <p className={styles.stockLabel}>pares</p>
+              <div className={styles.stockBlock}>
+                <StatusBadge label={row.is_active ? "Activa" : "Inactiva"} variant={row.is_active ? "success" : "neutral"} />
+                <div className={styles.stock}>
+                  <p className={styles.stockValue}>{row.stock_pairs}</p>
+                  <p className={styles.stockLabel}>pares</p>
+                </div>
               </div>
             </div>
           ))}

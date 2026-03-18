@@ -18,7 +18,7 @@ class CustomerPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class CountryListAPIView(generics.ListAPIView):
+class CountryListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = CountrySerializer
     queryset = Country.objects.all().order_by("name")
     pagination_class = None

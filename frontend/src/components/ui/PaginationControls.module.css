@@ -1,9 +1,9 @@
 .root {
-  @apply flex flex-col gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between;
+  @apply flex flex-col gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between;
 }
 
 .meta {
-  @apply text-sm text-slate-600;
+  @apply text-sm text-stone-600;
 }
 
 .actions {

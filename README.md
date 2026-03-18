@@ -53,6 +53,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#screenshots">Screenshots</a></li>
     <li><a href="#deployment">Deployment</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
@@ -181,6 +182,30 @@ Typical usage flows for the current version:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Screenshots
+
+### Dashboard
+
+![Dashboard](docs/screenshots/dashboard.PNG)
+
+### Orders
+
+![Orders](docs/screenshots/pedidos.PNG)
+
+### Inventory Movements
+
+![Inventory Movements](docs/screenshots/inv_movements.PNG)
+
+### Customer Form
+
+![Customer Form](docs/screenshots/client_form.PNG)
+
+### Order Form
+
+![Order Form](docs/screenshots/Order_form.PNG)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## Deployment
 
 The current public deployment path for this repository is the split-origin Render setup:
@@ -204,10 +229,8 @@ In this setup:
 - [x] Dashboard metrics and stock visibility
 - [x] Customers, orders, inventory, and expenses modules
 - [x] Render-ready login hardening with shared cache support
-- [ ] Seed/demo data command for faster portfolio setup
+- [ ] Seed/demo data command for faster setup
 - [ ] Expanded automated coverage across services and API workflows
-- [ ] Public screenshots or a short demo GIF set in the README
-- [ ] First live public demo deployment for portfolio presentation
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

@@ -99,7 +99,7 @@ export function LoginPage() {
             </div>
 
             <div className={formStyles.field}>
-              <label htmlFor="password">Contrasena</label>
+              <label htmlFor="password">Contraseña</label>
               <input id="password" type="password" autoComplete="current-password" {...register("password")} />
               {errors.password && <p className={formStyles.errorText}>{errors.password.message}</p>}
             </div>

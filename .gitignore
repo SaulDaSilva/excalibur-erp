@@ -21,6 +21,7 @@ backend/frontend_dist/
 .env.*
 **/.env
 **/.env.*
+docker/postgres/.env.db
 
 # Virtualenv
 .venv/
@@ -32,6 +33,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+coverage/
+*.tsbuildinfo
+frontend/.vite/
 .DS_Store
 frontend/dist/
 

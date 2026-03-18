@@ -2,13 +2,19 @@
   - name: excalibur-db
     databaseName: excalibur_erp
     user: excalibur
-    plan: starter
+    plan: free
 
 services:
+  - type: keyvalue
+    name: excalibur-auth-cache
+    plan: free
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
+
   - type: web
     name: excalibur-backend
     runtime: python
-    plan: starter
+    plan: free
     rootDir: backend
     buildCommand: bash build.sh
     startCommand: python -m gunicorn config.asgi:application -k uvicorn.workers.UvicornWorker
@@ -19,6 +25,11 @@ services:
       - key: DATABASE_URL
         fromDatabase:
           name: excalibur-db
+          property: connectionString
+      - key: DJANGO_CACHE_URL
+        fromService:
+          name: excalibur-auth-cache
+          type: keyvalue
           property: connectionString
       - key: SECRET_KEY
         generateValue: true

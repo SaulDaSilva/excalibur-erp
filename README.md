@@ -77,7 +77,7 @@ At its core, Excalibur ERP is:
 - A practical ERP for managing customers, orders, and inventory in one place
 - A dashboard-oriented internal tool for day-to-day visibility
 - A foundation for a live internal deployment on Render
-- A portfolio project grounded in a real operational workflow, not just a demo idea
+
 
 Current business capabilities include:
 

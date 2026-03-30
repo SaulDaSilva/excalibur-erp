@@ -38,7 +38,12 @@ coverage/
 frontend/.vite/
 .DS_Store
 frontend/dist/
+backups/
 
 # IDE
 .vscode/
 .idea/
+
+
+AGENTS.md
+

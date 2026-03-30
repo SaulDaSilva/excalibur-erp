@@ -1,0 +1,23 @@
+{
+  // Example Tailscale policy for the private ERP host.
+  // Replace user emails and the tailnet-specific tag ownership as needed.
+
+  "groups": {
+    "group:erp-users": [
+      "owner@example.com",
+      "ops@example.com",
+    ],
+  },
+
+  "tagOwners": {
+    "tag:erp-host": ["autogroup:admin"],
+  },
+
+  "grants": [
+    {
+      "src": ["group:erp-users"],
+      "dst": ["tag:erp-host"],
+      "ip": ["tcp:443"],
+    },
+  ],
+}

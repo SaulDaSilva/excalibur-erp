@@ -70,3 +70,28 @@ class CustomerIdValidationTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["country_name"], "Colombia")
         self.assertEqual(response.data["id_number"], "1234567890123")
+
+    def test_customer_api_update_allows_existing_id_number_on_same_customer(self):
+        customer = Customer.objects.create(
+            first_name="Laura",
+            last_name="Mendez",
+            id_number="1234567890123",
+            email="laura@example.com",
+            phone="0999999999",
+            country=self.colombia,
+        )
+
+        response = self.client.patch(
+            f"/api/clientes/{customer.id}/",
+            {
+                "phone": "0988888888",
+                "notes": "Cliente actualizado",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        customer.refresh_from_db()
+        self.assertEqual(customer.id_number, "1234567890123")
+        self.assertEqual(customer.phone, "0988888888")
+        self.assertEqual(customer.notes, "Cliente actualizado")

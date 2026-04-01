@@ -82,6 +82,9 @@ class CustomerSerializer(serializers.ModelSerializer):
                 **attrs,
             }
         )
+        if self.instance is not None:
+            instance.pk = self.instance.pk
+            instance._state.adding = False
         instance.full_clean()
         return attrs
 

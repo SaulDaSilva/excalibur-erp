@@ -16,6 +16,7 @@ import type {
   Pais,
   PaisCreateInput,
 } from "./types";
+import { isEcuadorCountry } from "./ecuadorLocations";
 import { ensurePrimaryAddress, extractApiValidation, isClienteFormSubmissionError } from "./utils";
 
 type ClienteFormValues = {
@@ -99,6 +100,7 @@ export function ClienteForm({
     reset,
     setError,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<ClienteFormValues>({ defaultValues });
 
@@ -111,6 +113,13 @@ export function ClienteForm({
     setAddresses(initialAddresses);
     setAddressErrors({});
   }, [initialAddresses]);
+
+  const selectedCountryId = watch("country");
+  const selectedCountry = useMemo(
+    () => paises.find((pais) => pais.id === selectedCountryId) ?? null,
+    [paises, selectedCountryId],
+  );
+  const useEcuadorAddressPreset = isEcuadorCountry(selectedCountry);
 
   const resetCountryEditor = () => {
     setCountryDraft({ name: "", iso_code: "" });
@@ -405,6 +414,7 @@ export function ClienteForm({
       <DireccionesEditor
         addresses={addresses}
         errors={addressErrors}
+        useEcuadorPreset={useEcuadorAddressPreset}
         onAdd={addAddress}
         onRemove={removeAddress}
         onChange={updateAddress}

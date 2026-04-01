@@ -1,10 +1,16 @@
 import { Button } from "../../components/ui/Button";
+import {
+  ECUADOR_PROVINCES,
+  getEcuadorCities,
+  mergeOption,
+} from "./ecuadorLocations";
 import type { DireccionDraft, DireccionFieldName } from "./types";
 import styles from "./DireccionesEditor.module.css";
 
 type DireccionesEditorProps = {
   addresses: DireccionDraft[];
   errors: Record<number, Partial<Record<DireccionFieldName, string>>>;
+  useEcuadorPreset: boolean;
   onAdd: () => void;
   onRemove: (index: number) => void;
   onChange: (index: number, patch: Partial<DireccionDraft>) => void;
@@ -14,6 +20,7 @@ type DireccionesEditorProps = {
 export function DireccionesEditor({
   addresses,
   errors,
+  useEcuadorPreset,
   onAdd,
   onRemove,
   onChange,
@@ -40,6 +47,8 @@ export function DireccionesEditor({
 
         {addresses.map((address, index) => {
           const addressErrors = errors[index] ?? {};
+          const provinceOptions = mergeOption(ECUADOR_PROVINCES, address.province);
+          const cityOptions = mergeOption(getEcuadorCities(address.province), address.city);
 
           return (
             <div key={address.id ?? `new-${index}`} className={styles.card}>
@@ -53,23 +62,54 @@ export function DireccionesEditor({
               <div className={styles.formGrid}>
                 <div className={styles.field}>
                   <label htmlFor={`province-${index}`}>Provincia</label>
-                  <input
-                    id={`province-${index}`}
-                    type="text"
-                    value={address.province}
-                    onChange={(event) => onChange(index, { province: event.target.value })}
-                  />
+                  {useEcuadorPreset ? (
+                    <select
+                      id={`province-${index}`}
+                      value={address.province}
+                      onChange={(event) => onChange(index, { province: event.target.value, city: "" })}
+                    >
+                      <option value="">Seleccione una provincia</option>
+                      {provinceOptions.map((province) => (
+                        <option key={province} value={province}>
+                          {province}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      id={`province-${index}`}
+                      type="text"
+                      value={address.province}
+                      onChange={(event) => onChange(index, { province: event.target.value })}
+                    />
+                  )}
                   {addressErrors.province && <p className={styles.errorText}>{addressErrors.province}</p>}
                 </div>
 
                 <div className={styles.field}>
                   <label htmlFor={`city-${index}`}>Ciudad</label>
-                  <input
-                    id={`city-${index}`}
-                    type="text"
-                    value={address.city}
-                    onChange={(event) => onChange(index, { city: event.target.value })}
-                  />
+                  {useEcuadorPreset ? (
+                    <select
+                      id={`city-${index}`}
+                      value={address.city}
+                      disabled={!address.province}
+                      onChange={(event) => onChange(index, { city: event.target.value })}
+                    >
+                      <option value="">{address.province ? "Seleccione una ciudad" : "Primero seleccione provincia"}</option>
+                      {cityOptions.map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      id={`city-${index}`}
+                      type="text"
+                      value={address.city}
+                      onChange={(event) => onChange(index, { city: event.target.value })}
+                    />
+                  )}
                   {addressErrors.city && <p className={styles.errorText}>{addressErrors.city}</p>}
                 </div>
 

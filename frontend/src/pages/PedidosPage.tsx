@@ -90,7 +90,7 @@ export function PedidosPage() {
 
       <FilterPanel
         title="Filtros"
-        subtitle="Filtra pedidos por texto, estado, cliente o rango de fechas."
+        subtitle="Filtra pedidos por texto, estado, cliente o rango de fecha del pedido."
         gridClassName="xl:grid-cols-5"
       >
           <input placeholder="Buscar..." value={q} onChange={(event) => setQ(event.target.value)} />

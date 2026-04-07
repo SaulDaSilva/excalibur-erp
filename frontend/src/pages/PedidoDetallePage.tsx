@@ -16,6 +16,7 @@ import {
   calculatePedidoItemSubtotal,
   formatPedidoChannel,
   formatPedidoCurrency,
+  formatPedidoDate,
   formatPedidoDateTime,
   formatPedidoStatus,
 } from "../features/pedidos/formatters";
@@ -148,7 +149,14 @@ export function PedidoDetallePage() {
               </div>
 
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Creado</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Fecha del pedido</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">
+                  {formatPedidoDate(pedidoQuery.data.order_date)}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Registrado en sistema</p>
                 <p className="mt-1 text-sm font-semibold text-slate-900">
                   {formatPedidoDateTime(pedidoQuery.data.created_at)}
                 </p>

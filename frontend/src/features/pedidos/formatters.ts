@@ -24,6 +24,16 @@ export function formatPedidoDateTime(value: string): string {
   return new Date(value).toLocaleString();
 }
 
+export function formatPedidoDate(value: string): string {
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) {
+    return value;
+  }
+  return new Intl.DateTimeFormat("es-EC", { dateStyle: "medium" }).format(
+    new Date(year, month - 1, day),
+  );
+}
+
 export function formatPedidoCurrency(value?: string): string {
   if (!value) {
     return "-";

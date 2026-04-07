@@ -29,6 +29,7 @@ export type PendingOrderItem = {
 
 export type PendingOrder = {
   id: number;
+  order_date: string;
   created_at: string;
   channel: string;
   status: "PENDING";

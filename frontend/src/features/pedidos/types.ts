@@ -43,6 +43,7 @@ export type Pedido = {
   promo_pairs?: number;
   total_pairs?: number;
   sold_amount?: string;
+  order_date: string;
   created_at: string;
   dispatched_at: string | null;
   cancelled_at: string | null;
@@ -59,6 +60,7 @@ export type OrderCreatePayload = {
   customer: number;
   shipping_address: number;
   channel: PedidoChannel;
+  order_date: string;
   items: PedidoItemPayload[];
 };
 

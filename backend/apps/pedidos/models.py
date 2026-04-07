@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from apps.core.models import TimeStampedModel
 from apps.clientes.models import Customer, Address
@@ -22,6 +23,7 @@ class Order(TimeStampedModel):
 
     channel = models.CharField(max_length=20, choices=Channel.choices, default=Channel.WHATSAPP, verbose_name="Canal")
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING, verbose_name="Estado")
+    order_date = models.DateField(default=timezone.localdate, verbose_name="Fecha del pedido")
 
     dispatched_at = models.DateTimeField(null=True, blank=True, editable=False)
     cancelled_at = models.DateTimeField(null=True, blank=True, editable=False)
@@ -29,14 +31,19 @@ class Order(TimeStampedModel):
     class Meta:
         verbose_name = "Pedido"
         verbose_name_plural = "Pedidos"
-        ordering = ["-created_at"]
+        ordering = ["-order_date", "-created_at"]
         indexes = [
+            models.Index(fields=["status", "order_date"], name="ped_ord_status_odate_idx"),
+            models.Index(fields=["customer", "order_date"], name="ped_ord_customer_odate_idx"),
             models.Index(fields=["status", "created_at"]),
             models.Index(fields=["customer", "created_at"]),
         ]
 
     def clean(self):
         super().clean()
+        if self.order_date and self.order_date > timezone.localdate():
+            raise ValidationError({"order_date": "La fecha del pedido no puede ser futura."})
+
         if self.customer_id and self.shipping_address_id:
             if self.shipping_address.customer_id != self.customer_id:
                 raise ValidationError({"shipping_address": "La dirección de envío no pertenece al cliente seleccionado."})

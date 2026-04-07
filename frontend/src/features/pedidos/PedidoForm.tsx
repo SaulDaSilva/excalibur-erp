@@ -19,8 +19,17 @@ type PedidoFormState = {
   customer: number;
   shipping_address: number;
   channel: "WHATSAPP" | "CALL";
+  order_date: string;
   items: PedidoItemPayload[];
 };
+
+function getTodayInputValue(): string {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 const initialItem: PedidoItemPayload = {
   kind: "SALE",
@@ -29,18 +38,25 @@ const initialItem: PedidoItemPayload = {
   unit_price: "1.00",
 };
 
-const initialFormState: PedidoFormState = {
-  customer: 0,
-  shipping_address: 0,
-  channel: "WHATSAPP",
-  items: [{ ...initialItem }],
-};
+function createInitialFormState(): PedidoFormState {
+  return {
+    customer: 0,
+    shipping_address: 0,
+    channel: "WHATSAPP",
+    order_date: getTodayInputValue(),
+    items: [{ ...initialItem }],
+  };
+}
 
 const schema = z
   .object({
     customer: z.number().int().positive("El cliente es obligatorio."),
     shipping_address: z.number().int().positive("La direccion de envio es obligatoria."),
     channel: z.enum(["WHATSAPP", "CALL"]),
+    order_date: z
+      .string()
+      .min(1, "La fecha del pedido es obligatoria.")
+      .refine((value) => value <= getTodayInputValue(), "La fecha del pedido no puede ser futura."),
     items: z
       .array(
         z.object({
@@ -73,7 +89,7 @@ const schema = z
   });
 
 export function PedidoForm({ onSubmit, onCancel }: PedidoFormProps) {
-  const [form, setForm] = useState<PedidoFormState>(initialFormState);
+  const [form, setForm] = useState<PedidoFormState>(() => createInitialFormState());
   const [selectedCustomer, setSelectedCustomer] = useState<Cliente | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -120,7 +136,7 @@ export function PedidoForm({ onSubmit, onCancel }: PedidoFormProps) {
     try {
       setIsSubmitting(true);
       await onSubmit(parsed.data);
-      setForm(initialFormState);
+      setForm(createInitialFormState());
       setSelectedCustomer(null);
     } catch (error) {
       setErrorMessage(toApiError(error).detail);
@@ -194,6 +210,16 @@ export function PedidoForm({ onSubmit, onCancel }: PedidoFormProps) {
             <option value="WHATSAPP">WhatsApp</option>
             <option value="CALL">Llamada</option>
           </select>
+        </div>
+
+        <div className={formStyles.field}>
+          <label>Fecha del pedido</label>
+          <input
+            type="date"
+            max={getTodayInputValue()}
+            value={form.order_date}
+            onChange={(event) => setForm({ ...form, order_date: event.target.value })}
+          />
         </div>
       </div>
 

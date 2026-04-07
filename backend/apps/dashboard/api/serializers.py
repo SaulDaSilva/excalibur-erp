@@ -45,6 +45,7 @@ class PendingOrderItemSerializer(serializers.Serializer):
 
 class PendingOrderSerializer(serializers.Serializer):
     id = serializers.IntegerField()
+    order_date = serializers.DateField()
     created_at = serializers.DateTimeField()
     channel = serializers.CharField()
     status = serializers.CharField()

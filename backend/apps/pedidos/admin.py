@@ -11,10 +11,10 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["id", "customer", "status", "channel", "created_at", "dispatched_at", "cancelled_at"]
-    list_filter = ["status", "channel", "created_at"]
+    list_display = ["id", "customer", "status", "channel", "order_date", "created_at", "dispatched_at", "cancelled_at"]
+    list_filter = ["status", "channel", "order_date", "created_at"]
     search_fields = ["id", "customer__first_name", "customer__last_name", "customer__id_number"]
-    date_hierarchy = "created_at"
+    date_hierarchy = "order_date"
     inlines = [OrderItemInline]
     
     actions = ["dispatch_selected", "cancel_selected"]

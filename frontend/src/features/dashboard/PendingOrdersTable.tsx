@@ -4,7 +4,7 @@ import { Card } from "../../components/ui/Card";
 import tableStyles from "../../components/ui/DataTable.module.css";
 import { TableCard } from "../../components/ui/TableCard";
 import { PedidoItemsBadges } from "../pedidos/PedidoItemsBadges";
-import { formatCurrencyUSD, formatDateTime } from "./formatters";
+import { formatCurrencyUSD, formatDate } from "./formatters";
 import type { PendingOrder } from "./types";
 import styles from "./PendingOrdersTable.module.css";
 
@@ -71,7 +71,7 @@ export function PendingOrdersTable({ orders, loading = false }: PendingOrdersTab
                     <p className={tableStyles.secondaryText}>{order.customer.id_number}</p>
                   </div>
                 </td>
-                <td className={tableStyles.td}>{formatDateTime(order.created_at)}</td>
+                <td className={tableStyles.td}>{formatDate(order.order_date)}</td>
                 <td className={tableStyles.td}>{getChannelLabel(order.channel)}</td>
                 <td className={`${tableStyles.td} ${styles.itemsCell}`}>
                   <PedidoItemsBadges items={order.items} maxVisible={3} stacked />

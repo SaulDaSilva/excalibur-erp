@@ -3,7 +3,7 @@ import styles from "../../components/ui/DataTable.module.css";
 import { Notice } from "../../components/ui/Notice";
 import { StatusBadge } from "../../components/ui/StatusBadge";
 import { TableCard } from "../../components/ui/TableCard";
-import { formatPedidoCurrency, formatPedidoDateTime, formatPedidoStatus } from "./formatters";
+import { formatPedidoCurrency, formatPedidoDate, formatPedidoStatus } from "./formatters";
 import { PedidoItemsBadges } from "./PedidoItemsBadges";
 import type { Pedido } from "./types";
 
@@ -38,7 +38,7 @@ export function PedidosTable({ data, onView, onDispatch, onCancel, onDelete }: P
         <thead className={styles.head}>
           <tr>
             <th className={styles.th}>ID</th>
-            <th className={styles.th}>Creado</th>
+            <th className={styles.th}>Fecha pedido</th>
             <th className={styles.th}>Cliente</th>
             <th className={styles.th}>Estado</th>
             <th className={styles.th}>Items</th>
@@ -51,7 +51,7 @@ export function PedidosTable({ data, onView, onDispatch, onCancel, onDelete }: P
           {data.map((pedido) => (
             <tr key={pedido.id} className={styles.row}>
               <td className={styles.td}>#{pedido.id}</td>
-              <td className={styles.td}>{formatPedidoDateTime(pedido.created_at)}</td>
+              <td className={styles.td}>{formatPedidoDate(pedido.order_date)}</td>
               <td className={styles.td}>
                 <div className={styles.cellStack}>
                   <p className={styles.primaryText}>

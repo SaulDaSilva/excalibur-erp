@@ -58,9 +58,9 @@ class OrderViewSet(
         if from_date and to_date and from_date > to_date:
             raise ValidationError({"detail": "El rango de fechas es inválido: from no puede ser mayor que to."})
         if from_date:
-            queryset = queryset.filter(created_at__date__gte=from_date)
+            queryset = queryset.filter(order_date__gte=from_date)
         if to_date:
-            queryset = queryset.filter(created_at__date__lte=to_date)
+            queryset = queryset.filter(order_date__lte=to_date)
 
         search_value = self.request.query_params.get("q", "").strip()
         if search_value:
@@ -80,7 +80,7 @@ class OrderViewSet(
         return (
             Order.objects.select_related("customer", "shipping_address")
             .prefetch_related("items__product_variant__product")
-            .order_by("-created_at")
+            .order_by("-order_date", "-created_at")
         )
 
     def get_serializer_class(self):

@@ -23,7 +23,7 @@ def get_dashboard_summary(low_stock_threshold: int = 10) -> dict[str, Any]:
                 queryset=OrderItem.objects.select_related("product_variant__product"),
             )
         )
-        .order_by("-created_at")
+        .order_by("-order_date", "-created_at")
     )
 
     pending_orders_count = pending_orders_queryset.count()
@@ -63,7 +63,7 @@ def _get_sales_last_7_days_usd() -> Decimal:
     total = (
         OrderItem.objects.filter(
             order__status=Order.Status.DISPATCHED,
-            order__created_at__gte=cutoff,
+            order__order_date__gte=cutoff.date(),
             kind=OrderItem.Kind.SALE,
         )
         .aggregate(total=Coalesce(Sum(amount_expression), value_zero))
@@ -75,7 +75,7 @@ def _get_pairs_last_7_days() -> dict[str, int]:
     aggregated = (
         OrderItem.objects.filter(
             order__status=Order.Status.DISPATCHED,
-            order__created_at__gte=cutoff,
+            order__order_date__gte=cutoff.date(),
         )
         .values("kind")
         .annotate(total_pairs=Coalesce(Sum("quantity_pairs"), 0))
@@ -140,6 +140,7 @@ def _serialize_pending_order(order: Order) -> dict[str, Any]:
 
     return {
         "id": order.id,
+        "order_date": order.order_date,
         "created_at": order.created_at,
         "channel": order.channel,
         "status": order.status,

@@ -74,6 +74,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "items",
             "status",
             "channel",
+            "order_date",
             "sold_pairs",
             "promo_pairs",
             "total_pairs",
@@ -114,7 +115,7 @@ class OrderWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ["customer", "shipping_address", "channel", "items"]
+        fields = ["customer", "shipping_address", "channel", "order_date", "items"]
 
     def validate(self, attrs):
         if "status" in self.initial_data:
@@ -174,7 +175,7 @@ class OrderWriteSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         items_data = validated_data.pop("items", None)
 
-        for field in ("customer", "shipping_address", "channel"):
+        for field in ("customer", "shipping_address", "channel", "order_date"):
             if field in validated_data:
                 setattr(instance, field, validated_data[field])
 

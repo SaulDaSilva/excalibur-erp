@@ -32,6 +32,16 @@ export function formatDateTime(isoString: string): string {
   return DATETIME_FORMATTER.format(date);
 }
 
+export function formatDate(value: string): string {
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) {
+    return value;
+  }
+  return new Intl.DateTimeFormat("es-EC", { dateStyle: "medium" }).format(
+    new Date(year, month - 1, day),
+  );
+}
+
 export function itemsSummary(items: PendingOrderItem[]): string {
   if (!items.length) {
     return "-";

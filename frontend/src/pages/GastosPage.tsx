@@ -62,36 +62,51 @@ export function GastosPage() {
       <FilterPanel
         title="Filtros"
         subtitle="Filtra gastos por texto, categoria, rango de fechas o registros inactivos."
-        gridClassName="xl:grid-cols-5"
+        gridClassName={filterPanelStyles.fiveFieldGrid}
       >
-        <input
-          placeholder="Buscar descripcion, proveedor o referencia..."
-          value={q}
-          onChange={(event) => setQ(event.target.value)}
-        />
-        <select
-          value={categoryId ?? ""}
-          onChange={(event) => setCategoryId(event.target.value ? Number(event.target.value) : null)}
-        >
-          <option value="">Todas las categorias</option>
-          {(categoriesQuery.data ?? []).map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-              {!category.is_active ? " (inactiva)" : ""}
-            </option>
-          ))}
-        </select>
-        <input type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
-        <input type="date" value={to} onChange={(event) => setTo(event.target.value)} />
-        <label className={filterPanelStyles.checkbox}>
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Busqueda</span>
           <input
-            className={filterPanelStyles.checkboxInput}
-            type="checkbox"
-            checked={includeInactive}
-            onChange={(event) => setIncludeInactive(event.target.checked)}
+            placeholder="Buscar descripcion, proveedor o referencia..."
+            value={q}
+            onChange={(event) => setQ(event.target.value)}
           />
-          Incluir inactivos
-        </label>
+        </div>
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Categoria</span>
+          <select
+            value={categoryId ?? ""}
+            onChange={(event) => setCategoryId(event.target.value ? Number(event.target.value) : null)}
+          >
+            <option value="">Todas las categorias</option>
+            {(categoriesQuery.data ?? []).map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+                {!category.is_active ? " (inactiva)" : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Desde</span>
+          <input type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
+        </div>
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Hasta</span>
+          <input type="date" value={to} onChange={(event) => setTo(event.target.value)} />
+        </div>
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Estado de registros</span>
+          <label className={filterPanelStyles.checkbox}>
+            <input
+              className={filterPanelStyles.checkboxInput}
+              type="checkbox"
+              checked={includeInactive}
+              onChange={(event) => setIncludeInactive(event.target.checked)}
+            />
+            Incluir inactivos
+          </label>
+        </div>
       </FilterPanel>
 
       {categoriesQuery.isError && <Notice variant="error" message={toApiError(categoriesQuery.error).detail} />}

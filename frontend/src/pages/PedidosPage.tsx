@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "../components/ui/Button";
-import { FilterPanel } from "../components/ui/FilterPanel";
+import { FilterPanel, filterPanelStyles } from "../components/ui/FilterPanel";
 import { Notice } from "../components/ui/Notice";
 import { PaginationControls } from "../components/ui/PaginationControls";
 import { PageHeader } from "../components/ui/PageHeader";
@@ -91,23 +91,38 @@ export function PedidosPage() {
       <FilterPanel
         title="Filtros"
         subtitle="Filtra pedidos por texto, estado, cliente o rango de fecha del pedido."
-        gridClassName="xl:grid-cols-5"
+        gridClassName={filterPanelStyles.fiveFieldGrid}
       >
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Busqueda</span>
           <input placeholder="Buscar..." value={q} onChange={(event) => setQ(event.target.value)} />
+        </div>
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Estado</span>
           <select value={status} onChange={(event) => setStatus(event.target.value as "" | PedidoStatus)}>
             <option value="">Todos los estados</option>
             <option value="PENDING">Pendiente</option>
             <option value="DISPATCHED">Despachado</option>
             <option value="CANCELLED">Cancelado</option>
           </select>
+        </div>
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Cliente</span>
           <input
             type="number"
             placeholder="ID cliente"
             value={customerId ?? ""}
             onChange={(event) => setCustomerId(event.target.value ? Number(event.target.value) : null)}
           />
+        </div>
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Desde</span>
           <input type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
+        </div>
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Hasta</span>
           <input type="date" value={to} onChange={(event) => setTo(event.target.value)} />
+        </div>
       </FilterPanel>
 
       {pedidosQuery.isLoading && <Notice variant="info" message="Cargando..." />}

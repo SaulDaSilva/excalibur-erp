@@ -31,12 +31,21 @@ export function InventarioStockPage() {
     <section className="space-y-6">
       <PageHeader subtitle="Consulta el stock actual por variante de producto." />
 
-      <FilterPanel title="Filtros" subtitle="Busca stock por producto y limita el resultado a variantes activas si lo necesitas.">
+      <FilterPanel
+        title="Filtros"
+        subtitle="Busca stock por producto y limita el resultado a variantes activas si lo necesitas."
+        gridClassName={filterPanelStyles.twoFieldGrid}
+      >
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Producto</span>
           <input
             placeholder="Buscar por producto..."
             value={stockSearch}
             onChange={(event) => setStockSearch(event.target.value)}
           />
+        </div>
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Estado de variantes</span>
           <label className={filterPanelStyles.checkbox}>
             <input
               className={filterPanelStyles.checkboxInput}
@@ -46,6 +55,7 @@ export function InventarioStockPage() {
             />
             Solo activos
           </label>
+        </div>
       </FilterPanel>
 
       {stockQuery.isError && (

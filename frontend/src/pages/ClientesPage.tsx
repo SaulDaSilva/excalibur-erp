@@ -65,8 +65,17 @@ export function ClientesPage() {
         }
       />
 
-      <FilterPanel title="Filtros" subtitle="Busca clientes y controla si deseas incluir registros inactivos.">
+      <FilterPanel
+        title="Filtros"
+        subtitle="Busca clientes y controla si deseas incluir registros inactivos."
+        gridClassName={filterPanelStyles.twoFieldGrid}
+      >
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Busqueda</span>
           <input placeholder="Buscar..." value={q} onChange={(event) => setQ(event.target.value)} />
+        </div>
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Estado de registros</span>
           <label className={filterPanelStyles.checkbox}>
             <input
               className={filterPanelStyles.checkboxInput}
@@ -76,6 +85,7 @@ export function ClientesPage() {
             />
             Incluir inactivos
           </label>
+        </div>
       </FilterPanel>
 
       {clientesQuery.isLoading && <Notice variant="info" message="Cargando..." />}

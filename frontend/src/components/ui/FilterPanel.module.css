@@ -24,6 +24,23 @@
   @apply xl:grid-cols-5;
 }
 
+.field {
+  @apply flex min-w-0 flex-col gap-2;
+}
+
+.fieldLabel {
+  @apply text-[0.68rem] font-semibold uppercase tracking-[0.18em];
+  color: var(--text-soft);
+}
+
+.fiveFieldGrid {
+  @apply xl:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(9.5rem,0.7fr)_minmax(9.5rem,0.7fr)];
+}
+
+.twoFieldGrid {
+  @apply md:grid-cols-[minmax(0,1.35fr)_minmax(14rem,0.75fr)] xl:grid-cols-[minmax(0,1.35fr)_minmax(14rem,0.75fr)];
+}
+
 .checkbox {
   @apply flex min-h-[3.05rem] items-center gap-3 rounded-2xl border px-3.5 py-3 text-sm font-medium shadow-[0_4px_12px_rgba(15,23,42,0.03)];
   border-color: var(--border-soft);

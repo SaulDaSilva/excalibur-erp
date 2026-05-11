@@ -26,17 +26,30 @@ const SECTIONS: NavSection[] = [
       { to: "/dashboard", label: "Dashboard", icon: "DS" },
       { to: "/clientes", label: "Clientes", icon: "CL" },
       { to: "/pedidos", label: "Pedidos", icon: "PD" },
-      { to: "/gastos", label: "Gastos", icon: "GT" },
     ],
   },
 ];
+
+const OPERACIONES_ITEMS: NavItem[] = [{ to: "/gastos", label: "Gastos", icon: "GT" }];
 
 const INVENTARIO_ITEMS: NavItem[] = [
   { to: "/inventario/stock", label: "Stock", icon: "ST" },
   { to: "/inventario/movimientos", label: "Movimientos", icon: "MV" },
 ];
 
+const ICON_PATHS: Record<string, string> = {
+  DS: "/dashboard.png",
+  CL: "/costumer.png",
+  PD: "/checkout.png",
+  GT: "/spending.png",
+  IV: "/in-stock.png",
+  ST: "/in-stock.png",
+  MV: "/in-stock.png",
+};
+
 function iconBlock(label: string, active: boolean) {
+  const iconSrc = ICON_PATHS[label];
+
   return (
     <span
       className={`inline-flex h-9 w-9 items-center justify-center rounded-2xl border text-[0.68rem] font-bold tracking-[0.16em] ${
@@ -46,7 +59,15 @@ function iconBlock(label: string, active: boolean) {
       }`}
       aria-hidden="true"
     >
-      {label}
+      {iconSrc ? (
+        <img
+          src={iconSrc}
+          alt=""
+          className={`h-[1.1rem] w-[1.1rem] object-contain ${active ? "opacity-100" : "opacity-65 grayscale-[0.15]"}`}
+        />
+      ) : (
+        label
+      )}
     </span>
   );
 }
@@ -82,12 +103,12 @@ export function Sidebar({ onLogout, isLoggingOut }: SidebarProps) {
     <>
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[18.75rem] flex-col border-r border-[var(--border-soft)] bg-[rgba(251,249,245,0.92)] px-4 py-5 backdrop-blur md:flex">
         <div className="mb-6 flex items-center gap-3 rounded-[26px] border border-[var(--border-soft)] bg-white/90 px-4 py-3 shadow-[0_10px_20px_rgba(15,23,42,0.04)]">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[linear-gradient(180deg,#131313_0%,#2c2c2c_100%)] text-sm font-bold text-white">
-            EX
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-[18px] bg-[linear-gradient(180deg,#131313_0%,#2c2c2c_100%)]">
+            <img src="/logo_web.png" alt="Excalibur" className="h-12 w-12 object-contain p-1.5" />
           </div>
           <div className="min-w-0">
-            <p className="text-lg font-semibold tracking-[-0.03em] text-[var(--text-main)]">Excalibur</p>
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--text-soft)]">ERP Workspace</p>
+            <p className="text-lg font-semibold tracking-[-0.03em] text-[var(--text-main)]">Excalibur ERP</p>
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--text-soft)]">Workspace</p>
           </div>
         </div>
 
@@ -114,9 +135,20 @@ export function Sidebar({ onLogout, isLoggingOut }: SidebarProps) {
 
           <div className="space-y-2">
             <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--text-soft)]">
-              Operations
+              Operaciones
             </p>
             <div className="rounded-[26px] border border-[var(--border-soft)] bg-[var(--surface-muted)] p-2">
+              {OPERACIONES_ITEMS.map((item) => (
+                <NavLink key={item.to} to={item.to} className={({ isActive }) => navItemClassName(isActive)}>
+                  {({ isActive }) => (
+                    <>
+                      {iconBlock(item.icon, isActive)}
+                      <span className="flex-1">{item.label}</span>
+                    </>
+                  )}
+                </NavLink>
+              ))}
+
               <button
                 type="button"
                 className={navItemClassName(isInventarioRoute)}
@@ -145,29 +177,19 @@ export function Sidebar({ onLogout, isLoggingOut }: SidebarProps) {
           </div>
         </nav>
 
-        <div className="mt-6 space-y-4">
-          <div className="rounded-[28px] border border-[rgba(49,94,251,0.12)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(238,242,255,0.9)_100%)] p-4 shadow-[0_16px_28px_rgba(49,94,251,0.08)]">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-soft)]">Session</p>
-            <p className="mt-2 text-base font-semibold tracking-[-0.02em] text-[var(--text-main)]">Workspace interno</p>
-            <p className="mt-1 text-sm leading-6 text-[var(--text-muted)]">
-              Navegacion operativa privada para pedidos, clientes, stock y gastos.
-            </p>
-          </div>
-
-          <div className="rounded-[24px] border border-[var(--border-soft)] bg-white/90 p-4 shadow-[0_8px_18px_rgba(15,23,42,0.04)]">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(180deg,#315efb_0%,#4a73ff_100%)] text-sm font-bold text-white">
-                ER
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-[var(--text-main)]">Usuario autenticado</p>
-                <p className="truncate text-xs text-[var(--text-soft)]">Acceso operativo</p>
-              </div>
+        <div className="mt-6 rounded-[24px] border border-[var(--border-soft)] bg-white/90 p-4 shadow-[0_8px_18px_rgba(15,23,42,0.04)]">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[linear-gradient(180deg,#315efb_0%,#4a73ff_100%)] text-sm font-bold text-white">
+              ER
             </div>
-            <Button variant="danger" className="w-full" onClick={onLogout} disabled={isLoggingOut}>
-              {isLoggingOut ? "Cerrando sesion..." : "Cerrar sesion"}
-            </Button>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-[var(--text-main)]">Usuario autenticado</p>
+              <p className="truncate text-xs text-[var(--text-soft)]">Acceso operativo</p>
+            </div>
           </div>
+          <Button variant="danger" className="w-full" onClick={onLogout} disabled={isLoggingOut}>
+            {isLoggingOut ? "Cerrando sesion..." : "Cerrar sesion"}
+          </Button>
         </div>
       </aside>
 
@@ -175,12 +197,12 @@ export function Sidebar({ onLogout, isLoggingOut }: SidebarProps) {
         <div className="rounded-[24px] border border-[var(--border-soft)] bg-white/90 p-3 shadow-[0_8px_18px_rgba(15,23,42,0.04)]">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[16px] bg-[linear-gradient(180deg,#131313_0%,#2c2c2c_100%)] text-xs font-bold text-white">
-                EX
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-[16px] bg-[linear-gradient(180deg,#131313_0%,#2c2c2c_100%)]">
+                <img src="/logo_web.png" alt="Excalibur" className="h-10 w-10 object-contain p-1" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-[var(--text-main)]">Excalibur</p>
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-soft)]">ERP Workspace</p>
+                <p className="text-sm font-semibold text-[var(--text-main)]">Excalibur ERP</p>
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-soft)]">Workspace</p>
               </div>
             </div>
             <Button variant="danger" className="px-3 py-2 text-xs" onClick={onLogout} disabled={isLoggingOut}>
@@ -190,6 +212,17 @@ export function Sidebar({ onLogout, isLoggingOut }: SidebarProps) {
 
           <nav className="mt-4 space-y-1.5">
             {SECTIONS[0].items.map((item) => (
+              <NavLink key={item.to} to={item.to} className={({ isActive }) => navItemClassName(isActive)}>
+                {({ isActive }) => (
+                  <>
+                    {iconBlock(item.icon, isActive)}
+                    <span>{item.label}</span>
+                  </>
+                )}
+              </NavLink>
+            ))}
+
+            {OPERACIONES_ITEMS.map((item) => (
               <NavLink key={item.to} to={item.to} className={({ isActive }) => navItemClassName(isActive)}>
                 {({ isActive }) => (
                   <>

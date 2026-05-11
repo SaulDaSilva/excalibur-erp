@@ -44,7 +44,7 @@ const ICON_PATHS: Record<string, string> = {
   GT: "spending.png",
   IV: "in-stock.png",
   ST: "in-stock.png",
-  MV: "in-stock.png",
+  MV: "conveyor.png",
 };
 
 function assetUrl(path: string): string {
@@ -108,8 +108,8 @@ export function Sidebar({ onLogout, isLoggingOut }: SidebarProps) {
     <>
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[18.75rem] flex-col border-r border-[var(--border-soft)] bg-[rgba(251,249,245,0.92)] px-4 py-5 backdrop-blur md:flex">
         <div className="mb-6 flex items-center gap-3 rounded-[26px] border border-[var(--border-soft)] bg-white/90 px-4 py-3 shadow-[0_10px_20px_rgba(15,23,42,0.04)]">
-          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-[18px] bg-[linear-gradient(180deg,#131313_0%,#2c2c2c_100%)]">
-            <img src={assetUrl("logo_web.png")} alt="Excalibur" className="h-12 w-12 object-contain p-1.5" />
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-[18px]">
+            <img src={assetUrl("logo_web.png")} alt="Excalibur" className="h-12 w-12 object-contain" />
           </div>
           <div className="min-w-0">
             <p className="text-lg font-semibold tracking-[-0.03em] text-[var(--text-main)]">Excalibur ERP</p>
@@ -202,8 +202,8 @@ export function Sidebar({ onLogout, isLoggingOut }: SidebarProps) {
         <div className="rounded-[24px] border border-[var(--border-soft)] bg-white/90 p-3 shadow-[0_8px_18px_rgba(15,23,42,0.04)]">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-[16px] bg-[linear-gradient(180deg,#131313_0%,#2c2c2c_100%)]">
-                <img src={assetUrl("logo_web.png")} alt="Excalibur" className="h-10 w-10 object-contain p-1" />
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-[16px]">
+                <img src={assetUrl("logo_web.png")} alt="Excalibur" className="h-10 w-10 object-contain" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-[var(--text-main)]">Excalibur ERP</p>

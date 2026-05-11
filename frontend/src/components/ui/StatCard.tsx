@@ -24,11 +24,13 @@ export function StatCard({ title, value, accent, helper, className = "" }: StatC
         )}
       </div>
 
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
-        <p className="text-[2.1rem] font-semibold leading-none tracking-[-0.05em] text-[var(--text-main)] md:text-[2.45rem]">
-          {value}
-        </p>
-        {helper && <div className="flex justify-center">{helper}</div>}
+      <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 items-center justify-center text-center">
+          <p className="text-[2.1rem] font-semibold leading-none tracking-[-0.05em] text-[var(--text-main)] md:text-[2.45rem]">
+            {value}
+          </p>
+        </div>
+        {helper && <div className="flex justify-center pt-3">{helper}</div>}
       </div>
     </Card>
   );

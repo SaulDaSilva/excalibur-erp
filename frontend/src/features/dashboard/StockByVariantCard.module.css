@@ -1,5 +1,5 @@
 .root {
-  @apply flex h-full min-h-[15rem] flex-col xl:col-span-2;
+  @apply flex h-full min-h-[11.5rem] flex-col xl:col-span-2;
 }
 
 .header {
@@ -7,15 +7,18 @@
 }
 
 .title {
-  @apply text-base font-semibold text-stone-900;
+  @apply text-lg font-semibold tracking-[-0.03em];
+  color: var(--text-main);
 }
 
 .subtitle {
-  @apply mt-1 text-sm text-stone-500;
+  @apply mt-1 text-sm leading-6;
+  color: var(--text-muted);
 }
 
 .feedback {
-  @apply mt-6 flex flex-1 items-center justify-center text-center text-sm text-stone-500;
+  @apply mt-6 flex flex-1 items-center justify-center text-center text-sm;
+  color: var(--text-muted);
 }
 
 .list {
@@ -25,23 +28,23 @@
 }
 
 .list::-webkit-scrollbar {
-  width: 0.55rem;
+  width: 0.45rem;
 }
 
 .list::-webkit-scrollbar-track {
-  @apply rounded-full bg-stone-100;
+  @apply rounded-full;
+  background: rgba(233, 227, 217, 0.75);
 }
 
 .list::-webkit-scrollbar-thumb {
-  @apply rounded-full bg-stone-300;
-}
-
-.list::-webkit-scrollbar-thumb:hover {
-  @apply bg-stone-400;
+  @apply rounded-full;
+  background: rgba(161, 154, 144, 0.8);
 }
 
 .row {
-  @apply flex items-center justify-between gap-4 rounded-xl border border-stone-200 bg-stone-50 px-4 py-3;
+  @apply flex items-center justify-between gap-4 rounded-[24px] border px-4 py-3;
+  border-color: var(--border-soft);
+  background: rgba(250, 247, 242, 0.86);
 }
 
 .info {
@@ -49,11 +52,13 @@
 }
 
 .name {
-  @apply truncate text-sm font-medium text-stone-900;
+  @apply truncate text-sm font-semibold tracking-[-0.01em];
+  color: var(--text-main);
 }
 
 .meta {
-  @apply mt-1 text-xs text-stone-500;
+  @apply mt-1 text-xs;
+  color: var(--text-soft);
 }
 
 .stockBlock {
@@ -65,9 +70,11 @@
 }
 
 .stockValue {
-  @apply text-xl font-semibold text-stone-900;
+  @apply text-2xl font-semibold tracking-[-0.04em];
+  color: var(--text-main);
 }
 
 .stockLabel {
-  @apply text-xs uppercase tracking-[0.12em] text-stone-500;
+  @apply text-[0.68rem] font-semibold uppercase tracking-[0.16em];
+  color: var(--text-soft);
 }

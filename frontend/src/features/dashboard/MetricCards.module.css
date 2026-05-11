@@ -1,3 +1,22 @@
 .helper {
-  @apply flex flex-wrap justify-center gap-2;
+  @apply flex flex-wrap gap-2;
+}
+
+.cardHelper {
+  @apply flex items-center justify-between gap-3 rounded-2xl border px-3 py-2;
+  border-color: var(--border-soft);
+  background: rgba(250, 247, 242, 0.86);
+}
+
+.helperText {
+  @apply text-xs font-medium;
+  color: var(--text-soft);
+}
+
+.microBars {
+  @apply flex items-end gap-1;
+}
+
+.microBar {
+  @apply inline-flex w-2 rounded-full;
 }

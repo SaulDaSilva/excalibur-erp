@@ -1,24 +1,67 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --app-bg: #f7f4ef;
+    --surface: #ffffff;
+    --surface-muted: #faf7f2;
+    --surface-strong: #f2eee8;
+    --border-soft: #e9e3d9;
+    --border-strong: #d9d1c3;
+    --text-main: #151515;
+    --text-muted: #7d776d;
+    --text-soft: #a19a90;
+    --accent: #315efb;
+    --accent-strong: #2448d8;
+    --accent-soft: #eef2ff;
+    --success-soft: #ecfdf3;
+    --success-text: #16724d;
+    --warning-soft: #fff7e8;
+    --warning-text: #9a6700;
+    --danger-soft: #fff1f2;
+    --danger-text: #be123c;
+    --shadow-soft: 0 18px 40px rgba(22, 18, 12, 0.06);
+    --shadow-card: 0 10px 28px rgba(24, 24, 24, 0.04);
+  }
+
   * {
     @apply box-border;
   }
 
   html {
-    font-family: "Inter", sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    color: var(--text-main);
+    background:
+      radial-gradient(circle at top left, rgba(49, 94, 251, 0.06), transparent 28%),
+      linear-gradient(180deg, #fbfaf8 0%, var(--app-bg) 100%);
   }
 
   body {
-    @apply m-0 min-w-[320px] bg-stone-50 text-stone-900 antialiased selection:bg-teal-100 selection:text-teal-900;
+    @apply m-0 min-w-[320px] antialiased;
+    color: var(--text-main);
+    background: transparent;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(49, 94, 251, 0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(49, 94, 251, 0.015) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.4;
+    z-index: -1;
   }
 
   a {
     @apply no-underline;
+    color: inherit;
   }
 
   button,
@@ -31,14 +74,64 @@
   input,
   select,
   textarea {
-    @apply w-full rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20;
+    @apply w-full rounded-2xl border px-4 py-3 text-sm transition duration-150 ease-out focus:outline-none;
+    border-color: var(--border-soft);
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--text-main);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 8px rgba(15, 23, 42, 0.02);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--text-soft);
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: rgba(49, 94, 251, 0.34);
+    box-shadow:
+      0 0 0 4px rgba(49, 94, 251, 0.1),
+      0 10px 24px rgba(49, 94, 251, 0.08);
+    background: var(--surface);
+  }
+
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    cursor: not-allowed;
+    background: var(--surface-muted);
+    color: var(--text-soft);
+  }
+
+  select {
+    appearance: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, #8f877c 50%),
+      linear-gradient(135deg, #8f877c 50%, transparent 50%);
+    background-position:
+      calc(100% - 18px) calc(50% - 3px),
+      calc(100% - 12px) calc(50% - 3px);
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 2.8rem;
+  }
+
+  textarea {
+    @apply resize-y;
+  }
+
+  input[type="checkbox"] {
+    @apply h-4 w-4 rounded-md p-0;
+    accent-color: var(--accent);
   }
 
   label {
-    @apply text-sm font-medium text-stone-700;
+    @apply text-[0.72rem] font-semibold uppercase tracking-[0.16em];
+    color: var(--text-muted);
   }
 
   hr {
-    @apply my-6 border-stone-200;
+    border-color: var(--border-soft);
   }
 }

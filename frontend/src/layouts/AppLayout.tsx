@@ -32,10 +32,10 @@ export function AppLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-transparent text-[var(--text-main)]">
       <Sidebar onLogout={handleLogout} isLoggingOut={isLoggingOut} />
 
-      <div className="flex min-h-screen flex-1 flex-col bg-stone-50 text-stone-900 md:ml-64">
+      <div className="flex min-h-screen flex-1 flex-col md:ml-[18.75rem]">
         <TopBar />
         {errorMessage && (
           <div className="px-4 pt-4 md:px-8">
@@ -43,7 +43,7 @@ export function AppLayout() {
           </div>
         )}
 
-        <main className="flex-1 p-4 md:p-8">
+        <main className="flex-1 px-4 pb-8 pt-4 md:px-8 md:pb-10">
           <Container>
             <Outlet />
           </Container>

@@ -1,5 +1,9 @@
 .brandPanel {
-  @apply w-full overflow-hidden rounded-2xl border border-stone-200 bg-[linear-gradient(180deg,_#ffffff_0%,_#f7f5f2_100%)] p-3 shadow-[0_12px_30px_rgba(28,25,23,0.08)];
+  @apply w-full overflow-hidden rounded-[30px] border p-4 shadow-[0_18px_40px_rgba(15,23,42,0.06)];
+  border-color: rgba(49, 94, 251, 0.1);
+  background:
+    radial-gradient(circle at top right, rgba(49, 94, 251, 0.18), transparent 38%),
+    linear-gradient(180deg, #ffffff 0%, #f6f3ee 100%);
 }
 
 .brand {
@@ -7,23 +11,28 @@
 }
 
 .brandLogo {
-  @apply block h-auto w-full rounded-xl object-cover drop-shadow-[0_10px_24px_rgba(28,25,23,0.12)];
+  @apply block h-auto w-full rounded-[24px] object-cover;
+  filter: drop-shadow(0 16px 28px rgba(49, 94, 251, 0.1));
 }
 
 .form {
-  @apply space-y-6;
+  @apply space-y-7;
 }
 
 .intro {
-  @apply rounded-xl border border-slate-200 bg-slate-50 px-4 py-3;
+  @apply rounded-[26px] border px-5 py-4;
+  border-color: var(--border-soft);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 247, 242, 0.88) 100%);
 }
 
 .introTitle {
-  @apply text-sm font-semibold text-slate-900;
+  @apply text-sm font-semibold tracking-[-0.01em];
+  color: var(--text-main);
 }
 
 .introText {
-  @apply mt-1 text-sm text-slate-600;
+  @apply mt-2 text-sm leading-6;
+  color: var(--text-muted);
 }
 
 .formGrid {
@@ -31,7 +40,7 @@
 }
 
 .field {
-  @apply flex flex-col gap-2;
+  @apply flex flex-col gap-2.5;
 }
 
 .fieldFull {
@@ -39,37 +48,50 @@
 }
 
 .hint {
-  @apply text-xs text-slate-500;
+  @apply text-xs;
+  color: var(--text-soft);
 }
 
 .errorText {
-  @apply text-xs text-rose-600;
+  @apply text-xs font-medium;
+  color: var(--danger-text);
 }
 
 .errorBox {
-  @apply rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700;
+  @apply rounded-2xl border px-4 py-3 text-sm font-medium;
+  border-color: rgb(254 205 211);
+  background: var(--danger-soft);
+  color: var(--danger-text);
 }
 
 .actions {
-  @apply flex flex-col-reverse gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:justify-end;
+  @apply flex flex-col-reverse gap-2 border-t pt-5 sm:flex-row sm:justify-end;
+  border-color: var(--border-soft);
 }
 
 .section {
-  @apply space-y-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4;
+  @apply space-y-4 rounded-[24px] border p-4;
+  border-color: var(--border-soft);
+  background: rgba(250, 247, 242, 0.82);
 }
 
 .sectionTitle {
-  @apply text-sm font-semibold text-slate-900;
+  @apply text-sm font-semibold;
+  color: var(--text-main);
 }
 
 .sectionText {
-  @apply text-sm text-slate-600;
+  @apply text-sm leading-6;
+  color: var(--text-muted);
 }
 
 .modalBackdrop {
-  @apply fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-4;
+  @apply fixed inset-0 z-50 grid place-items-center p-4;
+  background: rgba(20, 20, 20, 0.4);
+  backdrop-filter: blur(6px);
 }
 
 .modalPanel {
-  @apply w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-6;
+  @apply w-full rounded-[28px] border bg-white p-5 shadow-[0_24px_50px_rgba(15,23,42,0.12)] md:p-6;
+  border-color: var(--border-soft);
 }

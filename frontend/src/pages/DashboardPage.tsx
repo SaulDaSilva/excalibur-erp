@@ -15,9 +15,10 @@ export function DashboardPage() {
   return (
     <section className="space-y-6">
       <PageHeader
+        title="Overview"
         subtitle={
           summaryQuery.data?.generated_at
-            ? `Actualizado: ${formatDateTime(summaryQuery.data.generated_at)}`
+            ? `Actualizado por ultima vez: ${formatDateTime(summaryQuery.data.generated_at)}`
             : undefined
         }
       />

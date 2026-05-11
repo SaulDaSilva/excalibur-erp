@@ -7,11 +7,13 @@
 }
 
 .title {
-  @apply text-sm font-semibold uppercase tracking-[0.12em] text-stone-500;
+  @apply text-[0.72rem] font-semibold uppercase tracking-[0.18em];
+  color: var(--text-soft);
 }
 
 .subtitle {
-  @apply mt-2 text-sm text-stone-500;
+  @apply mt-2 max-w-3xl text-sm leading-6;
+  color: var(--text-muted);
 }
 
 .filterGrid {
@@ -23,9 +25,12 @@
 }
 
 .checkbox {
-  @apply flex items-center gap-2 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2.5 text-sm font-medium text-stone-700 shadow-sm;
+  @apply flex min-h-[3.05rem] items-center gap-3 rounded-2xl border px-3.5 py-3 text-sm font-medium shadow-[0_4px_12px_rgba(15,23,42,0.03)];
+  border-color: var(--border-soft);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text-main);
 }
 
 .checkboxInput {
-  @apply h-4 w-4 rounded border-stone-300;
+  @apply h-4 w-4 rounded-md;
 }

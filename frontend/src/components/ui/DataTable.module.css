@@ -3,27 +3,35 @@
 }
 
 .head {
-  @apply sticky top-0 z-10 border-b border-stone-200 bg-stone-50 text-stone-500;
+  @apply sticky top-0 z-10 border-b bg-[rgba(250,247,242,0.95)] backdrop-blur;
+  border-color: var(--border-soft);
+  color: var(--text-soft);
 }
 
 .th {
-  @apply px-5 py-4 text-left align-middle font-medium;
+  @apply px-5 py-4 text-left align-middle text-[0.72rem] font-semibold uppercase tracking-[0.16em];
 }
 
 .thRight {
-  @apply px-5 py-4 text-right align-middle font-medium;
+  @apply px-5 py-4 text-right align-middle text-[0.72rem] font-semibold uppercase tracking-[0.16em];
 }
 
 .body {
-  @apply divide-y divide-stone-200 bg-white text-stone-700;
+  @apply bg-white/95;
+  color: var(--text-muted);
 }
 
 .row {
-  @apply transition-colors hover:bg-stone-50;
+  @apply border-b transition duration-150 ease-out;
+  border-color: rgba(233, 227, 217, 0.82);
+}
+
+.row:hover {
+  background: rgba(250, 247, 242, 0.85);
 }
 
 .td {
-  @apply px-5 py-4 text-left align-middle;
+  @apply px-5 py-4 align-middle;
 }
 
 .tdRight {
@@ -31,15 +39,17 @@
 }
 
 .cellStack {
-  @apply flex flex-col gap-1;
+  @apply flex flex-col gap-1.5;
 }
 
 .primaryText {
-  @apply font-medium text-stone-900;
+  @apply font-semibold tracking-[-0.01em];
+  color: var(--text-main);
 }
 
 .secondaryText {
-  @apply text-xs text-stone-500;
+  @apply text-[0.72rem];
+  color: var(--text-soft);
 }
 
 .actions {

@@ -1,39 +1,52 @@
 .loadingTitle {
-  @apply text-lg font-semibold text-stone-900;
+  @apply text-lg font-semibold tracking-[-0.03em];
+  color: var(--text-main);
 }
 
 .loadingText {
-  @apply mt-3 text-sm text-stone-500;
+  @apply mt-3 text-sm;
+  color: var(--text-muted);
 }
 
 .card {
-  @apply p-0;
+  @apply overflow-hidden p-0;
 }
 
 .header {
-  @apply flex items-center justify-between border-b border-stone-200 px-5 py-4;
+  @apply flex items-center justify-between border-b px-6 py-5;
+  border-color: var(--border-soft);
 }
 
 .title {
-  @apply text-base font-semibold text-stone-900;
+  @apply text-lg font-semibold tracking-[-0.03em];
+  color: var(--text-main);
 }
 
 .tableCard {
-  @apply rounded-none border-0 shadow-none;
+  @apply rounded-none border-0 bg-transparent shadow-none;
 }
 
 .scrollArea {
-  @apply h-[28rem];
+  @apply h-[30rem];
 }
 
 .empty {
-  @apply px-5 py-6 text-center text-stone-500;
+  @apply px-6 py-8 text-center text-sm;
+  color: var(--text-muted);
 }
 
 .itemsCell {
-  @apply min-w-[15rem];
+  @apply min-w-[16rem];
 }
 
 .actionLink {
-  @apply inline-flex items-center justify-center rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm font-medium text-stone-900 shadow-sm hover:bg-stone-50;
+  @apply inline-flex items-center justify-center rounded-2xl border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition;
+  border-color: var(--border-soft);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-muted);
+}
+
+.actionLink:hover {
+  border-color: rgba(49, 94, 251, 0.18);
+  color: var(--accent);
 }

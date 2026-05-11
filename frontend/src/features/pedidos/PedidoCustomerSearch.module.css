@@ -3,39 +3,48 @@
 }
 
 .selectedCard {
-  @apply rounded-xl border border-slate-200 bg-slate-50 p-3;
+  @apply rounded-[24px] border bg-[rgba(247,247,252,0.86)] p-4 shadow-[var(--shadow-soft)];
+  border-color: var(--color-border);
 }
 
 .selectedTitle {
-  @apply text-xs font-medium uppercase tracking-wide text-slate-500;
+  @apply text-[0.7rem] font-semibold uppercase tracking-[0.2em];
+  color: var(--color-text-soft);
 }
 
 .selectedName {
-  @apply mt-1 text-sm font-semibold text-slate-900;
+  @apply mt-2 text-base font-semibold tracking-[-0.02em];
+  color: var(--color-text);
 }
 
 .selectedMeta {
-  @apply text-sm text-slate-600;
+  @apply text-sm;
+  color: var(--color-text-muted);
 }
 
 .results {
-  @apply max-h-64 space-y-2 overflow-auto rounded-xl border border-slate-200 bg-white p-2;
+  @apply max-h-72 space-y-2 overflow-auto rounded-[24px] border bg-white p-2.5 shadow-[var(--shadow-soft)];
+  border-color: var(--color-border);
 }
 
 .resultButton {
-  @apply w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-left hover:bg-slate-50;
+  @apply w-full rounded-2xl border bg-white px-4 py-3 text-left transition hover:-translate-y-px hover:bg-[rgba(247,247,252,0.82)];
+  border-color: var(--color-border-subtle);
 }
 
 .resultName {
-  @apply text-sm font-medium text-slate-900;
+  @apply text-sm font-semibold;
+  color: var(--color-text);
 }
 
 .resultMeta {
-  @apply text-xs text-slate-500;
+  @apply mt-1 text-xs;
+  color: var(--color-text-muted);
 }
 
 .hint {
-  @apply text-xs text-slate-500;
+  @apply text-xs;
+  color: var(--color-text-muted);
 }
 
 .error {

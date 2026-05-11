@@ -75,50 +75,15 @@ export function LoginPage() {
 
   return (
     <main className="min-h-screen px-4 py-8 md:px-8 md:py-10">
-      <div className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-[1280px] gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <Card className="relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-between">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(49,94,251,0.18),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(17,24,39,0.08),transparent_24%)]" />
-          <div className="relative z-10 flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-[linear-gradient(180deg,#131313_0%,#2c2c2c_100%)] text-base font-bold text-white">
-              EX
-            </div>
-            <div>
-              <p className="text-2xl font-semibold tracking-[-0.04em] text-[var(--text-main)]">Excalibur ERP</p>
-              <p className="text-sm text-[var(--text-muted)]">Workspace interno para operacion diaria</p>
-            </div>
+      <div className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-[1380px] items-center gap-8 lg:grid-cols-[1.08fr_0.92fr]">
+        <div className={formStyles.brand}>
+          <div className={`${formStyles.brandPanel} w-full`}>
+            <img src={brandLogo} alt="Excalibur ERP V2" className={formStyles.brandLogo} />
           </div>
+        </div>
 
-          <div className="relative z-10 space-y-6">
-            <div className={formStyles.brand}>
-              <div className={formStyles.brandPanel}>
-                <img src={brandLogo} alt="Excalibur ERP V2" className={formStyles.brandLogo} />
-              </div>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              {[
-                ["Clientes", "Gestiona catalogo y direcciones"],
-                ["Pedidos", "Opera ventas y despacho"],
-                ["Inventario", "Monitorea stock y movimientos"],
-              ].map(([title, copy]) => (
-                <div
-                  key={title}
-                  className="rounded-[24px] border border-[var(--border-soft)] bg-white/85 px-4 py-4 shadow-[0_8px_18px_rgba(15,23,42,0.04)]"
-                >
-                  <p className="text-sm font-semibold text-[var(--text-main)]">{title}</p>
-                  <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">{copy}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <p className="relative z-10 text-sm leading-6 text-[var(--text-muted)]">
-            Acceso privado para operacion comercial, inventario y control financiero del negocio.
-          </p>
-        </Card>
-
-        <div className="flex items-center">
-          <Card className="mx-auto w-full max-w-xl space-y-7">
+        <div className="flex items-center justify-center">
+          <Card className="mx-auto w-full max-w-xl space-y-7 rounded-[32px] px-6 py-7 md:px-8 md:py-8">
             <div className="space-y-3">
               <div className="inline-flex rounded-full border border-[var(--border-soft)] bg-[var(--surface-muted)] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-soft)]">
                 Secure login

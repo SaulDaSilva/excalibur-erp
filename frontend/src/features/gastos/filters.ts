@@ -23,6 +23,10 @@ export function buildGastosQueryString(params: ExpenseListParams): string {
     searchParams.set("q", params.q.trim());
   }
 
+  if (params.group) {
+    searchParams.set("form_group", params.group);
+  }
+
   if (params.categoryId) {
     searchParams.set("category_id", String(params.categoryId));
   }

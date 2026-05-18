@@ -53,6 +53,7 @@ class ExpenseCreatedBySerializer(serializers.ModelSerializer):
 
 
 class ExpenseSerializer(serializers.ModelSerializer):
+    category_group = serializers.CharField(source="category.form_group", read_only=True)
     category_name = serializers.CharField(source="category.name", read_only=True)
     created_by = ExpenseCreatedBySerializer(read_only=True)
 
@@ -61,6 +62,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "category",
+            "category_group",
             "category_name",
             "amount",
             "description",

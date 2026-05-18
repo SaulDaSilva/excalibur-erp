@@ -23,6 +23,16 @@ export type ExpenseFormGroup =
   | "SERVICIOS"
   | "MISCELANEO";
 
+export const EXPENSE_FORM_GROUP_LABELS: Record<ExpenseFormGroup, string> = {
+  VIAJES: "Viajes",
+  LOGISTICA: "Logistica",
+  PERSONAL: "Personal",
+  PRODUCCION: "Produccion",
+  FISCAL: "Fiscal",
+  SERVICIOS: "Servicios",
+  MISCELANEO: "Miscelaneo",
+};
+
 export type ExpenseCategoryCode =
   | "GALLERY"
   | "TRAVEL_EXPENSES"
@@ -52,6 +62,7 @@ export type ExpenseCreatedBy = {
 export type Expense = {
   id: number;
   category: number;
+  category_group: ExpenseFormGroup | null;
   category_name: string;
   amount: string;
   description: string;
@@ -76,6 +87,7 @@ export type ExpenseListParams = {
   page: number;
   pageSize: number;
   q: string;
+  group: ExpenseFormGroup | null;
   categoryId: number | null;
   from: string;
   to: string;

@@ -30,14 +30,15 @@ export function useExpenses({
   page,
   pageSize,
   q,
+  group,
   categoryId,
   from,
   to,
   includeInactive,
 }: ExpenseListParams) {
   return useQuery({
-    queryKey: ["gastos", { page, pageSize, q, categoryId, from, to, includeInactive }],
-    queryFn: () => listExpenses({ page, pageSize, q, categoryId, from, to, includeInactive }),
+    queryKey: ["gastos", { page, pageSize, q, group, categoryId, from, to, includeInactive }],
+    queryFn: () => listExpenses({ page, pageSize, q, group, categoryId, from, to, includeInactive }),
     placeholderData: (previous) => previous,
   });
 }

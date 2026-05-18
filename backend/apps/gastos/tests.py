@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from apps.gastos.models import ExpenseCategory
+from apps.gastos.models import Expense, ExpenseCategory
 from apps.users.models import User
 
 
@@ -89,3 +89,33 @@ class ExpenseDynamicCategoryAPITests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(any(item["code"] == ExpenseCategory.Code.TRAVEL_EXPENSES for item in response.data))
         self.assertTrue(any(item["form_group"] == ExpenseCategory.FormGroup.SERVICIOS for item in response.data))
+
+    def test_list_expenses_can_filter_by_form_group(self):
+        Expense.objects.create(
+            category=self.travel_category,
+            amount="12.50",
+            description="Viaje a feria",
+            expense_date=timezone.localdate(),
+            supplier_name="",
+            reference_number="",
+            notes="",
+            details={"destination": "Bogota"},
+            created_by=self.user,
+        )
+        Expense.objects.create(
+            category=self.service_category,
+            amount="25.00",
+            description="Apoyo contable",
+            expense_date=timezone.localdate(),
+            supplier_name="",
+            reference_number="",
+            notes="",
+            details={"service_provider_name": "Ana"},
+            created_by=self.user,
+        )
+
+        response = self.client.get("/api/gastos/?form_group=VIAJES")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["category_group"], ExpenseCategory.FormGroup.VIAJES)

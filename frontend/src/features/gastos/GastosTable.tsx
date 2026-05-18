@@ -1,9 +1,8 @@
 import { Button } from "../../components/ui/Button";
 import styles from "../../components/ui/DataTable.module.css";
 import { Notice } from "../../components/ui/Notice";
-import { StatusBadge } from "../../components/ui/StatusBadge";
 import { TableCard } from "../../components/ui/TableCard";
-import type { Expense } from "./types";
+import { EXPENSE_FORM_GROUP_LABELS, type Expense } from "./types";
 
 type GastosTableProps = {
   data: Expense[];
@@ -45,11 +44,10 @@ export function GastosTable({ data, onEdit, onDelete }: GastosTableProps) {
           <tr>
             <th className={styles.th}>Fecha</th>
             <th className={styles.th}>Categoria</th>
+            <th className={styles.th}>Subcategoria</th>
             <th className={styles.th}>Descripcion</th>
-            <th className={styles.th}>Proveedor</th>
-            <th className={styles.th}>Referencia</th>
+            <th className={styles.th}>Observaciones</th>
             <th className={styles.th}>Monto</th>
-            <th className={styles.th}>Estado</th>
             <th className={styles.thRight}>Acciones</th>
           </tr>
         </thead>
@@ -58,28 +56,19 @@ export function GastosTable({ data, onEdit, onDelete }: GastosTableProps) {
             <tr key={expense.id} className={styles.row}>
               <td className={styles.td}>{formatExpenseDate(expense.expense_date)}</td>
               <td className={styles.td}>
-                <div className={styles.cellStack}>
-                  <p className={styles.primaryText}>{expense.category_name}</p>
-                </div>
+                {expense.category_group ? EXPENSE_FORM_GROUP_LABELS[expense.category_group] : "-"}
+              </td>
+              <td className={styles.td}>
+                {expense.category_name}
               </td>
               <td className={styles.td}>
                 <div className={styles.cellStack}>
                   <p className={styles.primaryText}>{expense.description}</p>
-                  <p className={styles.secondaryText}>
-                    {expense.created_by ? `Creado por ${expense.created_by.username}` : "Sin usuario asociado"}
-                  </p>
                 </div>
               </td>
-              <td className={styles.td}>{expense.supplier_name || "-"}</td>
-              <td className={styles.td}>{expense.reference_number || "-"}</td>
+              <td className={styles.td}>{expense.notes || "-"}</td>
               <td className={styles.td}>
                 <span className="font-medium text-stone-900">{formatCurrency(expense.amount)}</span>
-              </td>
-              <td className={styles.td}>
-                <StatusBadge
-                  label={expense.is_active ? "Activo" : "Inactivo"}
-                  variant={expense.is_active ? "success" : "neutral"}
-                />
               </td>
               <td className={styles.tdRight}>
                 <div className={styles.actions}>

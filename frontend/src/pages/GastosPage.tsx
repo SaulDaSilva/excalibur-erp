@@ -8,7 +8,7 @@ import { PaginationControls } from "../components/ui/PaginationControls";
 import { PageHeader } from "../components/ui/PageHeader";
 import { GastosTable } from "../features/gastos/GastosTable";
 import { useDeleteExpense, useExpenseCategories, useExpenses } from "../features/gastos/hooks";
-import type { Expense } from "../features/gastos/types";
+import { EXPENSE_FORM_GROUP_LABELS, type Expense, type ExpenseFormGroup } from "../features/gastos/types";
 import { toApiError } from "../lib/api";
 
 const PAGE_SIZE = 10;
@@ -17,6 +17,7 @@ export function GastosPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [q, setQ] = useState("");
+  const [group, setGroup] = useState<ExpenseFormGroup | null>(null);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -24,7 +25,14 @@ export function GastosPage() {
   const [pageError, setPageError] = useState("");
 
   const categoriesQuery = useExpenseCategories({ includeInactive: true });
-  const expensesQuery = useExpenses({ page, pageSize: PAGE_SIZE, q, categoryId, from, to, includeInactive });
+  const filteredCategories = useMemo(() => {
+    const categories = categoriesQuery.data ?? [];
+    if (!group) {
+      return categories;
+    }
+    return categories.filter((category) => category.form_group === group);
+  }, [categoriesQuery.data, group]);
+  const expensesQuery = useExpenses({ page, pageSize: PAGE_SIZE, q, group, categoryId, from, to, includeInactive });
   const deleteExpense = useDeleteExpense();
 
   const totalPages = useMemo(() => {
@@ -34,7 +42,18 @@ export function GastosPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [q, categoryId, from, to, includeInactive]);
+  }, [q, group, categoryId, from, to, includeInactive]);
+
+  useEffect(() => {
+    setCategoryId((currentCategoryId) => {
+      if (currentCategoryId === null) {
+        return null;
+      }
+
+      const categoryStillValid = filteredCategories.some((category) => category.id === currentCategoryId);
+      return categoryStillValid ? currentCategoryId : null;
+    });
+  }, [filteredCategories]);
 
   const handleDelete = async (expense: Expense) => {
     if (!window.confirm(`Eliminar gasto "${expense.description}"?`)) {
@@ -61,13 +80,13 @@ export function GastosPage() {
 
       <FilterPanel
         title="Filtros"
-        subtitle="Filtra gastos por texto, categoria, rango de fechas o registros inactivos."
-        gridClassName={filterPanelStyles.fiveFieldGrid}
+        subtitle="Filtra gastos por texto, grupo, subcategoria, rango de fechas o registros inactivos."
+        gridClassName={filterPanelStyles.sixFieldGrid}
       >
         <div className={filterPanelStyles.field}>
           <span className={filterPanelStyles.fieldLabel}>Busqueda</span>
           <input
-            placeholder="Buscar descripcion, proveedor o referencia..."
+            placeholder="Buscar descripcion u observaciones..."
             value={q}
             onChange={(event) => setQ(event.target.value)}
           />
@@ -75,11 +94,26 @@ export function GastosPage() {
         <div className={filterPanelStyles.field}>
           <span className={filterPanelStyles.fieldLabel}>Categoria</span>
           <select
+            value={group ?? ""}
+            onChange={(event) => setGroup((event.target.value as ExpenseFormGroup) || null)}
+          >
+            <option value="">Todas las categorias</option>
+            {Object.entries(EXPENSE_FORM_GROUP_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className={filterPanelStyles.field}>
+          <span className={filterPanelStyles.fieldLabel}>Subcategoria</span>
+          <select
+            disabled={!group}
             value={categoryId ?? ""}
             onChange={(event) => setCategoryId(event.target.value ? Number(event.target.value) : null)}
           >
-            <option value="">Todas las categorias</option>
-            {(categoriesQuery.data ?? []).map((category) => (
+            <option value="">{group ? "Todas las subcategorias" : "Seleccione primero una categoria"}</option>
+            {filteredCategories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
                 {!category.is_active ? " (inactiva)" : ""}

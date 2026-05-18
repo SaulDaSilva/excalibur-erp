@@ -107,7 +107,7 @@ function createEmptyExpenseDetails(): ExpenseDetailsFormValues {
 function createDefaultValues(initialData: Expense | null): ExpenseFormValues {
   const details = initialData?.details ?? {};
   return {
-    group: "",
+    group: initialData?.category_group ?? "",
     category: initialData?.category ?? 0,
     amount: initialData?.amount ?? "",
     description: initialData?.description ?? "",

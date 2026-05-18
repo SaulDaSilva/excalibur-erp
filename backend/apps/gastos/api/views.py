@@ -62,6 +62,13 @@ class ExpenseListCreateAPIView(generics.ListCreateAPIView):
                 raise ValidationError({"category_id": "Debe ser un entero valido."})
             queryset = queryset.filter(category_id=int(category_id))
 
+        form_group = self.request.query_params.get("form_group", "").strip().upper()
+        if form_group:
+            valid_groups = {choice for choice, _ in ExpenseCategory.FormGroup.choices}
+            if form_group not in valid_groups:
+                raise ValidationError({"form_group": "Grupo de categoria invalido."})
+            queryset = queryset.filter(category__form_group=form_group)
+
         from_value = self.request.query_params.get("from", "").strip()
         to_value = self.request.query_params.get("to", "").strip()
         from_date = self._parse_query_date(from_value, "from") if from_value else None

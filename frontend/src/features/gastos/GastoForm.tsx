@@ -263,8 +263,9 @@ export function GastoForm({ mode, initialData, categories, onSubmit, onCancel }:
   }, [defaultValues, reset]);
 
   useEffect(() => {
-    if (selectedCategory?.form_group && selectedCategory.form_group !== selectedGroup) {
+    if (!selectedGroup && selectedCategory?.form_group) {
       setValue("group", selectedCategory.form_group, { shouldDirty: false });
+      previousGroup.current = selectedCategory.form_group;
     }
   }, [selectedCategory, selectedGroup, setValue]);
 
@@ -274,6 +275,7 @@ export function GastoForm({ mode, initialData, categories, onSubmit, onCancel }:
     }
 
     previousGroup.current = selectedGroup;
+    const currentValues = getValues();
 
     if (!selectedGroup) {
       setValue("category", 0, { shouldDirty: true });
@@ -283,7 +285,7 @@ export function GastoForm({ mode, initialData, categories, onSubmit, onCancel }:
       return;
     }
 
-    if (selectedCategory?.form_group === selectedGroup) {
+    if (selectedCategory && selectedCategory.form_group === selectedGroup) {
       return;
     }
 
@@ -291,7 +293,6 @@ export function GastoForm({ mode, initialData, categories, onSubmit, onCancel }:
     setValue("supplier_name", "", { shouldDirty: true });
     setValue("reference_number", "", { shouldDirty: true });
 
-    const currentValues = getValues();
     const nextDetails = createEmptyExpenseDetails();
     if (selectedGroup === "VIAJES") {
       nextDetails.destination = currentValues.details.destination;

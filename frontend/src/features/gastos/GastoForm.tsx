@@ -24,6 +24,7 @@ type ExpenseDetailsFormValues = {
 };
 
 type ExpenseFormValues = {
+  group: ExpenseFormGroup | "";
   category: number;
   amount: string;
   description: string;
@@ -47,7 +48,22 @@ type GastoFormProps = {
   onCancel: () => void;
 };
 
+const GROUP_OPTIONS: Array<{ value: ExpenseFormGroup; label: string }> = [
+  { value: "LOGISTICA", label: "Logistica" },
+  { value: "PERSONAL", label: "Personal" },
+  { value: "PRODUCCION", label: "Produccion" },
+  { value: "FISCAL", label: "Fiscal" },
+  { value: "SERVICIOS", label: "Servicios" },
+  { value: "MISCELANEO", label: "Miscelaneo" },
+  { value: "VIAJES", label: "Viajes" },
+];
+
+const GROUP_VALUES = GROUP_OPTIONS.map((group) => group.value) as [ExpenseFormGroup, ...ExpenseFormGroup[]];
+
 const expenseSchema = z.object({
+  group: z.enum(GROUP_VALUES, {
+    message: "El grupo es obligatorio.",
+  }),
   category: z.number().int().positive("La categoria es obligatoria."),
   amount: z
     .string()
@@ -91,6 +107,7 @@ function createEmptyExpenseDetails(): ExpenseDetailsFormValues {
 function createDefaultValues(initialData: Expense | null): ExpenseFormValues {
   const details = initialData?.details ?? {};
   return {
+    group: "",
     category: initialData?.category ?? 0,
     amount: initialData?.amount ?? "",
     description: initialData?.description ?? "",
@@ -196,6 +213,7 @@ function buildExpenseDetails(
 export function GastoForm({ mode, initialData, categories, onSubmit, onCancel }: GastoFormProps) {
   const [submitError, setSubmitError] = useState("");
   const defaultValues = useMemo(() => createDefaultValues(initialData), [initialData]);
+  const previousGroup = useRef<ExpenseFormGroup | "">(defaultValues.group);
   const previousCategoryId = useRef<number | null>(defaultValues.category || null);
 
   const {
@@ -210,23 +228,83 @@ export function GastoForm({ mode, initialData, categories, onSubmit, onCancel }:
     formState: { errors, isSubmitting },
   } = useForm<ExpenseFormValues>({ defaultValues });
 
+  const selectedGroup = watch("group");
   const selectedCategoryId = watch("category");
   const selectedCategory = useMemo(
     () => categories.find((category) => category.id === selectedCategoryId) ?? null,
     [categories, selectedCategoryId],
   );
+  const groupCategories = useMemo(
+    () =>
+      categories.filter(
+        (category) =>
+          category.form_group === selectedGroup &&
+          (category.is_system || category.id === selectedCategoryId),
+      ),
+    [categories, selectedCategoryId, selectedGroup],
+  );
   const visibleCategories = useMemo(
-    () => categories.filter((category) => category.is_system || category.id === selectedCategoryId),
-    [categories, selectedCategoryId],
+    () => {
+      if (!selectedGroup) {
+        return selectedCategory ? [selectedCategory] : [];
+      }
+      return groupCategories;
+    },
+    [groupCategories, selectedCategory, selectedGroup],
   );
   const showSupplierName = shouldShowSupplierName(selectedCategory);
   const showReferenceNumber = shouldShowReferenceNumber(selectedCategory);
 
   useEffect(() => {
     reset(defaultValues);
+    previousGroup.current = defaultValues.group;
     previousCategoryId.current = defaultValues.category || null;
     setSubmitError("");
   }, [defaultValues, reset]);
+
+  useEffect(() => {
+    if (selectedCategory?.form_group && selectedCategory.form_group !== selectedGroup) {
+      setValue("group", selectedCategory.form_group, { shouldDirty: false });
+    }
+  }, [selectedCategory, selectedGroup, setValue]);
+
+  useEffect(() => {
+    if (previousGroup.current === selectedGroup) {
+      return;
+    }
+
+    previousGroup.current = selectedGroup;
+
+    if (!selectedGroup) {
+      setValue("category", 0, { shouldDirty: true });
+      setValue("supplier_name", "", { shouldDirty: true });
+      setValue("reference_number", "", { shouldDirty: true });
+      setValue("details", createEmptyExpenseDetails(), { shouldDirty: true });
+      return;
+    }
+
+    if (selectedCategory?.form_group === selectedGroup) {
+      return;
+    }
+
+    setValue("category", 0, { shouldDirty: true });
+    setValue("supplier_name", "", { shouldDirty: true });
+    setValue("reference_number", "", { shouldDirty: true });
+
+    const currentValues = getValues();
+    const nextDetails = createEmptyExpenseDetails();
+    if (selectedGroup === "VIAJES") {
+      nextDetails.destination = currentValues.details.destination;
+    }
+    if (selectedGroup === "PERSONAL") {
+      nextDetails.employee_name = currentValues.details.employee_name;
+      nextDetails.payment_concept = currentValues.details.payment_concept;
+    }
+    if (selectedGroup === "SERVICIOS") {
+      nextDetails.service_provider_name = currentValues.details.service_provider_name;
+    }
+    setValue("details", nextDetails, { shouldDirty: true });
+  }, [getValues, selectedCategory, selectedGroup, setValue]);
 
   useEffect(() => {
     if (!selectedCategoryId || selectedCategoryId <= 0) {
@@ -348,15 +426,28 @@ export function GastoForm({ mode, initialData, categories, onSubmit, onCancel }:
           {mode === "create" ? "Registrar gasto" : "Actualizar gasto"}
         </p>
         <p className={formStyles.introText}>
-          Registra gastos por categoria usando solo los datos que realmente aplican a cada caso.
+          Registra el gasto seleccionando primero el grupo y luego la subcategoria correspondiente.
         </p>
       </div>
 
       <div className={formStyles.formGrid}>
+        <div className={formStyles.field}>
+          <label htmlFor="group">Grupo</label>
+          <select id="group" {...register("group")}>
+            <option value="">Seleccione un grupo</option>
+            {GROUP_OPTIONS.map((group) => (
+              <option key={group.value} value={group.value}>
+                {group.label}
+              </option>
+            ))}
+          </select>
+          {errors.group && <p className={formStyles.errorText}>{errors.group.message}</p>}
+        </div>
+
         <div className={`${formStyles.field} ${formStyles.fieldFull}`}>
-          <label htmlFor="category">Categoria</label>
+          <label htmlFor="category">Subcategoria</label>
           <select id="category" {...register("category", { valueAsNumber: true })}>
-            <option value={0}>Seleccione una categoria</option>
+            <option value={0}>{selectedGroup ? "Seleccione una subcategoria" : "Seleccione primero un grupo"}</option>
             {visibleCategories.map((category) => (
               <option
                 key={category.id}

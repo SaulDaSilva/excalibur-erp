@@ -32,12 +32,12 @@ class ExpenseCategoryListCreateAPIView(generics.ListCreateAPIView):
         if search_term:
             queryset = queryset.filter(name__icontains=search_term)
 
-        return queryset.order_by("name")
+        return queryset.order_by("sort_order", "name")
 
 
 class ExpenseCategoryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ExpenseCategorySerializer
-    queryset = ExpenseCategory.objects.all().order_by("name")
+    queryset = ExpenseCategory.objects.all().order_by("sort_order", "name")
 
     def destroy(self, request, *args, **kwargs):
         category = self.get_object()

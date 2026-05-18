@@ -13,12 +13,25 @@ class ExpenseCategorySerializer(serializers.ModelSerializer):
             "id",
             "name",
             "description",
+            "code",
+            "form_group",
+            "sort_order",
+            "is_system",
             "is_active",
             "created_at",
             "updated_at",
             "deleted_at",
         ]
-        read_only_fields = ["is_active", "created_at", "updated_at", "deleted_at"]
+        read_only_fields = [
+            "code",
+            "form_group",
+            "sort_order",
+            "is_system",
+            "is_active",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+        ]
 
     def validate_name(self, value: str) -> str:
         normalized = value.strip()
@@ -55,6 +68,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
             "supplier_name",
             "reference_number",
             "notes",
+            "details",
             "created_by",
             "is_active",
             "created_at",
@@ -78,6 +92,16 @@ class ExpenseSerializer(serializers.ModelSerializer):
     def validate_notes(self, value: str) -> str:
         return value.strip()
 
+    def validate_details(self, value):
+        if value in (None, ""):
+            return {}
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("Los detalles del gasto deben ser un objeto JSON.")
+        return {
+            key: item.strip() if isinstance(item, str) else item
+            for key, item in value.items()
+        }
+
     def validate(self, attrs):
         instance = Expense(
             **{
@@ -90,6 +114,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
                         "supplier_name": self.instance.supplier_name,
                         "reference_number": self.instance.reference_number,
                         "notes": self.instance.notes,
+                        "details": self.instance.details,
                         "created_by": self.instance.created_by,
                         "is_active": self.instance.is_active,
                     }

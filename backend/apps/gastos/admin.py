@@ -14,11 +14,11 @@ class SoftDeleteAdminMixin:
 
 @admin.register(ExpenseCategory)
 class ExpenseCategoryAdmin(SoftDeleteAdminMixin, admin.ModelAdmin):
-    list_display = ["name", "is_active", "created_at", "updated_at"]
-    list_filter = ["is_active", "created_at"]
-    search_fields = ["name", "description"]
+    list_display = ["sort_order", "name", "code", "form_group", "is_system", "is_active", "created_at", "updated_at"]
+    list_filter = ["form_group", "is_system", "is_active", "created_at"]
+    search_fields = ["name", "description", "code"]
     readonly_fields = ["created_at", "updated_at", "deleted_at"]
-    ordering = ["name"]
+    ordering = ["sort_order", "name"]
 
 
 @admin.register(Expense)

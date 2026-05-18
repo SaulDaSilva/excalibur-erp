@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { type Path, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "../../components/ui/Button";
@@ -8,17 +8,20 @@ import { toApiError } from "../../lib/api";
 import type {
   Expense,
   ExpenseCategory,
-  ExpenseCategoryCreateInput,
   ExpenseCreateInput,
+  ExpenseDetails,
   ExpenseFormSubmitPayload,
+  ExpenseFormGroup,
   ExpenseUpdateInput,
 } from "./types";
-import {
-  EXPENSE_CATEGORY_FIELDS,
-  EXPENSE_FIELDS,
-  extractApiValidation,
-  isExpenseFormSubmissionError,
-} from "./utils";
+import { EXPENSE_FIELDS, extractApiValidation, isExpenseFormSubmissionError } from "./utils";
+
+type ExpenseDetailsFormValues = {
+  destination: string;
+  employee_name: string;
+  payment_concept: string;
+  service_provider_name: string;
+};
 
 type ExpenseFormValues = {
   category: number;
@@ -28,13 +31,18 @@ type ExpenseFormValues = {
   supplier_name: string;
   reference_number: string;
   notes: string;
+  details: ExpenseDetailsFormValues;
+};
+
+type DynamicFieldIssue = {
+  path: Path<ExpenseFormValues>;
+  message: string;
 };
 
 type GastoFormProps = {
   mode: "create" | "edit";
   initialData: Expense | null;
   categories: ExpenseCategory[];
-  onCreateCategory: (data: ExpenseCategoryCreateInput) => Promise<ExpenseCategory>;
   onSubmit: (data: ExpenseFormSubmitPayload) => Promise<void>;
   onCancel: () => void;
 };
@@ -63,45 +71,132 @@ const expenseSchema = z.object({
   supplier_name: z.string().trim(),
   reference_number: z.string().trim(),
   notes: z.string().trim(),
+  details: z.object({
+    destination: z.string().trim(),
+    employee_name: z.string().trim(),
+    payment_concept: z.string().trim(),
+    service_provider_name: z.string().trim(),
+  }),
 });
 
-const categorySchema = z.object({
-  name: z.string().trim().min(1, "El nombre de la categoria es obligatorio."),
-  description: z.string().trim(),
-});
+function createEmptyExpenseDetails(): ExpenseDetailsFormValues {
+  return {
+    destination: "",
+    employee_name: "",
+    payment_concept: "",
+    service_provider_name: "",
+  };
+}
 
-export function GastoForm({
-  mode,
-  initialData,
-  categories,
-  onCreateCategory,
-  onSubmit,
-  onCancel,
-}: GastoFormProps) {
+function createDefaultValues(initialData: Expense | null): ExpenseFormValues {
+  const details = initialData?.details ?? {};
+  return {
+    category: initialData?.category ?? 0,
+    amount: initialData?.amount ?? "",
+    description: initialData?.description ?? "",
+    expense_date: initialData?.expense_date ?? "",
+    supplier_name: initialData?.supplier_name ?? "",
+    reference_number: initialData?.reference_number ?? "",
+    notes: initialData?.notes ?? "",
+    details: {
+      destination: details.destination ?? "",
+      employee_name: details.employee_name ?? "",
+      payment_concept: details.payment_concept ?? "",
+      service_provider_name: details.service_provider_name ?? "",
+    },
+  };
+}
+
+function shouldShowSupplierName(category: ExpenseCategory | null): boolean {
+  if (!category) {
+    return false;
+  }
+
+  return category.code === "DELIVERY_RUNS" || category.form_group === "MISCELANEO";
+}
+
+function shouldShowReferenceNumber(category: ExpenseCategory | null): boolean {
+  if (!category) {
+    return false;
+  }
+
+  return category.form_group === "MISCELANEO";
+}
+
+function getDynamicIssues(
+  values: ExpenseFormValues,
+  category: ExpenseCategory | null,
+): DynamicFieldIssue[] {
+  if (!category || !category.form_group) {
+    return [];
+  }
+
+  const issues: DynamicFieldIssue[] = [];
+  const group = category.form_group as ExpenseFormGroup;
+
+  if (group === "VIAJES" && !values.details.destination.trim()) {
+    issues.push({
+      path: "details.destination",
+      message: "El destino es obligatorio para gastos de viajes.",
+    });
+  }
+
+  if (group === "PERSONAL") {
+    if (!values.details.employee_name.trim()) {
+      issues.push({
+        path: "details.employee_name",
+        message: "El nombre del empleado es obligatorio.",
+      });
+    }
+    if (!values.details.payment_concept.trim()) {
+      issues.push({
+        path: "details.payment_concept",
+        message: "El concepto del pago es obligatorio.",
+      });
+    }
+  }
+
+  if (group === "SERVICIOS" && !values.details.service_provider_name.trim()) {
+    issues.push({
+      path: "details.service_provider_name",
+      message: "El nombre del prestador del servicio es obligatorio.",
+    });
+  }
+
+  return issues;
+}
+
+function buildExpenseDetails(
+  values: ExpenseFormValues,
+  category: ExpenseCategory | null,
+): ExpenseDetails {
+  if (!category || !category.form_group) {
+    return {};
+  }
+
+  switch (category.form_group as ExpenseFormGroup) {
+    case "VIAJES":
+      return {
+        destination: values.details.destination.trim(),
+      };
+    case "PERSONAL":
+      return {
+        employee_name: values.details.employee_name.trim(),
+        payment_concept: values.details.payment_concept.trim(),
+      };
+    case "SERVICIOS":
+      return {
+        service_provider_name: values.details.service_provider_name.trim(),
+      };
+    default:
+      return {};
+  }
+}
+
+export function GastoForm({ mode, initialData, categories, onSubmit, onCancel }: GastoFormProps) {
   const [submitError, setSubmitError] = useState("");
-  const [isCategoryEditorOpen, setIsCategoryEditorOpen] = useState(false);
-  const [categoryDraft, setCategoryDraft] = useState<ExpenseCategoryCreateInput>({
-    name: "",
-    description: "",
-  });
-  const [categoryFieldErrors, setCategoryFieldErrors] = useState<
-    Partial<Record<keyof ExpenseCategoryCreateInput, string>>
-  >({});
-  const [categorySubmitError, setCategorySubmitError] = useState("");
-  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
-
-  const defaultValues = useMemo<ExpenseFormValues>(
-    () => ({
-      category: initialData?.category ?? 0,
-      amount: initialData?.amount ?? "",
-      description: initialData?.description ?? "",
-      expense_date: initialData?.expense_date ?? "",
-      supplier_name: initialData?.supplier_name ?? "",
-      reference_number: initialData?.reference_number ?? "",
-      notes: initialData?.notes ?? "",
-    }),
-    [initialData],
-  );
+  const defaultValues = useMemo(() => createDefaultValues(initialData), [initialData]);
+  const previousCategoryId = useRef<number | null>(defaultValues.category || null);
 
   const {
     register,
@@ -109,65 +204,99 @@ export function GastoForm({
     reset,
     setError,
     setValue,
+    getValues,
     watch,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<ExpenseFormValues>({ defaultValues });
 
   const selectedCategoryId = watch("category");
+  const selectedCategory = useMemo(
+    () => categories.find((category) => category.id === selectedCategoryId) ?? null,
+    [categories, selectedCategoryId],
+  );
+  const visibleCategories = useMemo(
+    () => categories.filter((category) => category.is_system || category.id === selectedCategoryId),
+    [categories, selectedCategoryId],
+  );
+  const showSupplierName = shouldShowSupplierName(selectedCategory);
+  const showReferenceNumber = shouldShowReferenceNumber(selectedCategory);
 
   useEffect(() => {
     reset(defaultValues);
+    previousCategoryId.current = defaultValues.category || null;
     setSubmitError("");
   }, [defaultValues, reset]);
 
-  const resetCategoryEditor = () => {
-    setCategoryDraft({ name: "", description: "" });
-    setCategoryFieldErrors({});
-    setCategorySubmitError("");
-    setIsCategoryEditorOpen(false);
-  };
-
-  const handleCreateCategory = async () => {
-    setCategoryFieldErrors({});
-    setCategorySubmitError("");
-
-    const parsed = categorySchema.safeParse(categoryDraft);
-    if (!parsed.success) {
-      const nextErrors: Partial<Record<keyof ExpenseCategoryCreateInput, string>> = {};
-      for (const issue of parsed.error.issues) {
-        const fieldName = issue.path[0];
-        if (fieldName === "name" || fieldName === "description") {
-          nextErrors[fieldName] = issue.message;
-        }
-      }
-      setCategoryFieldErrors(nextErrors);
+  useEffect(() => {
+    if (!selectedCategoryId || selectedCategoryId <= 0) {
+      previousCategoryId.current = null;
       return;
     }
 
-    setIsCreatingCategory(true);
-    try {
-      const created = await onCreateCategory(parsed.data);
-      setValue("category", created.id, { shouldDirty: true, shouldValidate: true });
-      resetCategoryEditor();
-    } catch (error) {
-      const { detail, fieldErrors } = extractApiValidation(error, EXPENSE_CATEGORY_FIELDS);
-      setCategoryFieldErrors(fieldErrors);
-      setCategorySubmitError(detail ?? "No se pudo crear la categoria.");
-    } finally {
-      setIsCreatingCategory(false);
+    if (previousCategoryId.current === null) {
+      previousCategoryId.current = selectedCategoryId;
+      return;
     }
-  };
+
+    if (previousCategoryId.current === selectedCategoryId) {
+      return;
+    }
+
+    previousCategoryId.current = selectedCategoryId;
+    const currentValues = getValues();
+
+    setValue("supplier_name", showSupplierName ? currentValues.supplier_name : "", {
+      shouldDirty: true,
+    });
+    setValue("reference_number", showReferenceNumber ? currentValues.reference_number : "", {
+      shouldDirty: true,
+    });
+
+    const nextDetails = createEmptyExpenseDetails();
+    if (selectedCategory?.form_group === "VIAJES") {
+      nextDetails.destination = currentValues.details.destination;
+    }
+    if (selectedCategory?.form_group === "PERSONAL") {
+      nextDetails.employee_name = currentValues.details.employee_name;
+      nextDetails.payment_concept = currentValues.details.payment_concept;
+    }
+    if (selectedCategory?.form_group === "SERVICIOS") {
+      nextDetails.service_provider_name = currentValues.details.service_provider_name;
+    }
+
+    setValue("details", nextDetails, { shouldDirty: true });
+  }, [
+    getValues,
+    selectedCategory,
+    selectedCategoryId,
+    setValue,
+    showReferenceNumber,
+    showSupplierName,
+  ]);
 
   const submit = handleSubmit(async (values) => {
+    clearErrors();
     setSubmitError("");
 
     const parsed = expenseSchema.safeParse(values);
     if (!parsed.success) {
       for (const issue of parsed.error.issues) {
-        const fieldName = issue.path[0];
-        if (typeof fieldName === "string") {
-          setError(fieldName as keyof ExpenseFormValues, { message: issue.message });
-        }
+        const fieldName = issue.path.join(".") as Path<ExpenseFormValues>;
+        setError(fieldName, { message: issue.message });
+      }
+      return;
+    }
+
+    if (!selectedCategory) {
+      setError("category", { message: "La categoria es obligatoria." });
+      return;
+    }
+
+    const dynamicIssues = getDynamicIssues(parsed.data, selectedCategory);
+    if (dynamicIssues.length > 0) {
+      for (const issue of dynamicIssues) {
+        setError(issue.path, { message: issue.message });
       }
       return;
     }
@@ -177,9 +306,10 @@ export function GastoForm({
       amount: Number(parsed.data.amount).toFixed(2),
       description: parsed.data.description,
       expense_date: parsed.data.expense_date,
-      supplier_name: parsed.data.supplier_name,
-      reference_number: parsed.data.reference_number,
+      supplier_name: showSupplierName ? parsed.data.supplier_name.trim() : "",
+      reference_number: showReferenceNumber ? parsed.data.reference_number.trim() : "",
       notes: parsed.data.notes,
+      details: buildExpenseDetails(parsed.data, selectedCategory),
     };
 
     try {
@@ -189,7 +319,7 @@ export function GastoForm({
         if (error.fieldErrors) {
           for (const [fieldName, message] of Object.entries(error.fieldErrors)) {
             if (message) {
-              setError(fieldName as keyof ExpenseFormValues, { message });
+              setError(fieldName as Path<ExpenseFormValues>, { message });
             }
           }
         }
@@ -203,7 +333,7 @@ export function GastoForm({
       if (Object.keys(fieldErrors).length > 0) {
         for (const [fieldName, message] of Object.entries(fieldErrors)) {
           if (message) {
-            setError(fieldName as keyof ExpenseFormValues, { message });
+            setError(fieldName as Path<ExpenseFormValues>, { message });
           }
         }
       }
@@ -218,107 +348,27 @@ export function GastoForm({
           {mode === "create" ? "Registrar gasto" : "Actualizar gasto"}
         </p>
         <p className={formStyles.introText}>
-          Registra gastos realizados para mantener control operativo y facilitar reportes posteriores.
+          Registra gastos por categoria usando solo los datos que realmente aplican a cada caso.
         </p>
       </div>
 
       <div className={formStyles.formGrid}>
         <div className={`${formStyles.field} ${formStyles.fieldFull}`}>
           <label htmlFor="category">Categoria</label>
-          <div className="flex flex-col gap-3 md:flex-row md:items-end">
-            <div className="flex-1">
-              <select id="category" {...register("category", { valueAsNumber: true })}>
-                <option value={0}>Seleccione una categoria</option>
-                {categories.map((category) => (
-                  <option
-                    key={category.id}
-                    value={category.id}
-                    disabled={!category.is_active && category.id !== selectedCategoryId}
-                  >
-                    {category.name}
-                    {!category.is_active ? " (inactiva)" : ""}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <Button
-              type="button"
-              variant="secondary"
-              className="md:self-end"
-              onClick={() => {
-                setCategorySubmitError("");
-                setCategoryFieldErrors({});
-                setIsCategoryEditorOpen((current) => !current);
-              }}
-            >
-              {isCategoryEditorOpen ? "Ocultar nueva categoria" : "Nueva categoria"}
-            </Button>
-          </div>
+          <select id="category" {...register("category", { valueAsNumber: true })}>
+            <option value={0}>Seleccione una categoria</option>
+            {visibleCategories.map((category) => (
+              <option
+                key={category.id}
+                value={category.id}
+                disabled={!category.is_active && category.id !== selectedCategoryId}
+              >
+                {category.name}
+                {!category.is_active ? " (inactiva)" : ""}
+              </option>
+            ))}
+          </select>
           {errors.category && <p className={formStyles.errorText}>{errors.category.message}</p>}
-
-          {isCategoryEditorOpen && (
-            <div className={formStyles.section}>
-              <div>
-                <p className={formStyles.sectionTitle}>Crear categoria</p>
-                <p className={formStyles.sectionText}>
-                  Agrega una categoria al catalogo y quedara seleccionada automaticamente.
-                </p>
-              </div>
-
-              <div className={formStyles.formGrid}>
-                <div className={formStyles.field}>
-                  <label htmlFor="category_name_create">Nombre</label>
-                  <input
-                    id="category_name_create"
-                    type="text"
-                    value={categoryDraft.name}
-                    onChange={(event) =>
-                      setCategoryDraft((previous) => ({ ...previous, name: event.target.value }))
-                    }
-                  />
-                  {categoryFieldErrors.name && (
-                    <p className={formStyles.errorText}>{categoryFieldErrors.name}</p>
-                  )}
-                </div>
-
-                <div className={formStyles.field}>
-                  <label htmlFor="category_description_create">Descripcion</label>
-                  <input
-                    id="category_description_create"
-                    type="text"
-                    value={categoryDraft.description}
-                    onChange={(event) =>
-                      setCategoryDraft((previous) => ({ ...previous, description: event.target.value }))
-                    }
-                  />
-                  {categoryFieldErrors.description && (
-                    <p className={formStyles.errorText}>{categoryFieldErrors.description}</p>
-                  )}
-                </div>
-              </div>
-
-              {categorySubmitError && <p className={formStyles.errorBox}>{categorySubmitError}</p>}
-
-              <div className="flex flex-wrap justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={resetCategoryEditor}
-                  disabled={isCreatingCategory}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="button"
-                  variant="primary"
-                  onClick={handleCreateCategory}
-                  disabled={isCreatingCategory}
-                >
-                  {isCreatingCategory ? "Guardando categoria..." : "Guardar categoria"}
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
 
         <div className={formStyles.field}>
@@ -338,23 +388,96 @@ export function GastoForm({
           <input
             id="description"
             type="text"
-            placeholder="Describe el gasto realizado"
+            placeholder="Describe el concepto del gasto"
             {...register("description")}
           />
           {errors.description && <p className={formStyles.errorText}>{errors.description.message}</p>}
         </div>
 
-        <div className={formStyles.field}>
-          <label htmlFor="supplier_name">Proveedor</label>
-          <input id="supplier_name" type="text" placeholder="DHL, proveedor local, etc." {...register("supplier_name")} />
-          {errors.supplier_name && <p className={formStyles.errorText}>{errors.supplier_name.message}</p>}
-        </div>
+        {selectedCategory?.form_group === "VIAJES" && (
+          <div className={formStyles.field}>
+            <label htmlFor="travel_destination">Destino</label>
+            <input
+              id="travel_destination"
+              type="text"
+              placeholder="Ciudad o destino del viaje"
+              {...register("details.destination")}
+            />
+            {errors.details?.destination && (
+              <p className={formStyles.errorText}>{errors.details.destination.message}</p>
+            )}
+          </div>
+        )}
 
-        <div className={formStyles.field}>
-          <label htmlFor="reference_number">Referencia</label>
-          <input id="reference_number" type="text" placeholder="Factura, guia, recibo..." {...register("reference_number")} />
-          {errors.reference_number && <p className={formStyles.errorText}>{errors.reference_number.message}</p>}
-        </div>
+        {selectedCategory?.form_group === "PERSONAL" && (
+          <>
+            <div className={formStyles.field}>
+              <label htmlFor="employee_name">Nombre del empleado</label>
+              <input
+                id="employee_name"
+                type="text"
+                placeholder="Empleado relacionado al pago"
+                {...register("details.employee_name")}
+              />
+              {errors.details?.employee_name && (
+                <p className={formStyles.errorText}>{errors.details.employee_name.message}</p>
+              )}
+            </div>
+            <div className={formStyles.field}>
+              <label htmlFor="payment_concept">Concepto del pago</label>
+              <input
+                id="payment_concept"
+                type="text"
+                placeholder="Motivo o concepto del pago"
+                {...register("details.payment_concept")}
+              />
+              {errors.details?.payment_concept && (
+                <p className={formStyles.errorText}>{errors.details.payment_concept.message}</p>
+              )}
+            </div>
+          </>
+        )}
+
+        {selectedCategory?.form_group === "SERVICIOS" && (
+          <div className={formStyles.field}>
+            <label htmlFor="service_provider_name">Nombre del prestador del servicio</label>
+            <input
+              id="service_provider_name"
+              type="text"
+              placeholder="Nombre de quien presta el servicio"
+              {...register("details.service_provider_name")}
+            />
+            {errors.details?.service_provider_name && (
+              <p className={formStyles.errorText}>{errors.details.service_provider_name.message}</p>
+            )}
+          </div>
+        )}
+
+        {showSupplierName && (
+          <div className={formStyles.field}>
+            <label htmlFor="supplier_name">Proveedor</label>
+            <input
+              id="supplier_name"
+              type="text"
+              placeholder="Mensajero, proveedor o tercero"
+              {...register("supplier_name")}
+            />
+            {errors.supplier_name && <p className={formStyles.errorText}>{errors.supplier_name.message}</p>}
+          </div>
+        )}
+
+        {showReferenceNumber && (
+          <div className={formStyles.field}>
+            <label htmlFor="reference_number">Referencia</label>
+            <input
+              id="reference_number"
+              type="text"
+              placeholder="Factura, recibo u otra referencia"
+              {...register("reference_number")}
+            />
+            {errors.reference_number && <p className={formStyles.errorText}>{errors.reference_number.message}</p>}
+          </div>
+        )}
 
         <div className={`${formStyles.field} ${formStyles.fieldFull}`}>
           <label htmlFor="notes">Observaciones</label>

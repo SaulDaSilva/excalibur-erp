@@ -4,10 +4,44 @@ export type ExpenseCategory = {
   id: number;
   name: string;
   description: string;
+  code: ExpenseCategoryCode | null;
+  form_group: ExpenseFormGroup | null;
+  sort_order: number;
+  is_system: boolean;
   is_active: boolean;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+};
+
+export type ExpenseFormGroup =
+  | "VIAJES"
+  | "LOGISTICA"
+  | "PERSONAL"
+  | "PRODUCCION"
+  | "FISCAL"
+  | "SERVICIOS"
+  | "MISCELANEO";
+
+export type ExpenseCategoryCode =
+  | "GALLERY"
+  | "TRAVEL_EXPENSES"
+  | "CUBOX_STORAGE"
+  | "DHL"
+  | "EMPLOYEE_PAYMENTS"
+  | "SPUR_PAINTING"
+  | "DELIVERY_RUNS"
+  | "MISCELLANEOUS"
+  | "VAT_DECLARATIONS"
+  | "PROVIDED_SERVICES"
+  | "SUPPLIES"
+  | "PRODUCTION_MOLDS";
+
+export type ExpenseDetails = {
+  destination?: string;
+  employee_name?: string;
+  payment_concept?: string;
+  service_provider_name?: string;
 };
 
 export type ExpenseCreatedBy = {
@@ -25,6 +59,7 @@ export type Expense = {
   supplier_name: string;
   reference_number: string;
   notes: string;
+  details: ExpenseDetails;
   created_by: ExpenseCreatedBy | null;
   is_active: boolean;
   created_at: string;
@@ -60,6 +95,7 @@ export type ExpenseCreateInput = {
   supplier_name: string;
   reference_number: string;
   notes: string;
+  details: ExpenseDetails;
 };
 
 export type ExpenseUpdateInput = ExpenseCreateInput;
@@ -73,7 +109,11 @@ export type ExpenseFieldName =
   | "expense_date"
   | "supplier_name"
   | "reference_number"
-  | "notes";
+  | "notes"
+  | "details.destination"
+  | "details.employee_name"
+  | "details.payment_concept"
+  | "details.service_provider_name";
 
 export type ExpenseCategoryFieldName = "name" | "description";
 

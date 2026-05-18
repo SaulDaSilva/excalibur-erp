@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
@@ -9,16 +8,11 @@ import { PageHeader } from "../components/ui/PageHeader";
 import { GastoForm } from "../features/gastos/GastoForm";
 import {
   useCreateExpense,
-  useCreateExpenseCategory,
   useExpense,
   useExpenseCategories,
   useUpdateExpense,
 } from "../features/gastos/hooks";
-import type {
-  ExpenseCategory,
-  ExpenseCategoryCreateInput,
-  ExpenseFormSubmitPayload,
-} from "../features/gastos/types";
+import type { ExpenseFormSubmitPayload } from "../features/gastos/types";
 import { toApiError } from "../lib/api";
 
 type GastoFormPageProps = {
@@ -27,7 +21,6 @@ type GastoFormPageProps = {
 
 export function GastoFormPage({ mode }: GastoFormPageProps) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const params = useParams();
 
   const expenseId = mode === "edit" ? Number(params.gastoId) : null;
@@ -37,7 +30,6 @@ export function GastoFormPage({ mode }: GastoFormPageProps) {
   const expenseQuery = useExpense(mode === "edit" && hasValidExpenseId ? expenseId : null);
   const createExpense = useCreateExpense();
   const updateExpense = useUpdateExpense();
-  const createCategory = useCreateExpenseCategory();
 
   const isLoading = categoriesQuery.isLoading || (mode === "edit" && expenseQuery.isLoading);
 
@@ -49,12 +41,6 @@ export function GastoFormPage({ mode }: GastoFormPageProps) {
       "",
     [categoriesQuery.error, categoriesQuery.isError, expenseQuery.error, expenseQuery.isError, hasValidExpenseId],
   );
-
-  const handleCreateCategory = async (payload: ExpenseCategoryCreateInput): Promise<ExpenseCategory> => {
-    const created = await createCategory.mutateAsync(payload);
-    await queryClient.invalidateQueries({ queryKey: ["gasto-categorias"] });
-    return created;
-  };
 
   const handleSubmit = async (payload: ExpenseFormSubmitPayload) => {
     if (mode === "create") {
@@ -90,7 +76,6 @@ export function GastoFormPage({ mode }: GastoFormPageProps) {
             mode={mode}
             initialData={expenseQuery.data ?? null}
             categories={categoriesQuery.data ?? []}
-            onCreateCategory={handleCreateCategory}
             onSubmit={handleSubmit}
             onCancel={() => navigate("/gastos")}
           />

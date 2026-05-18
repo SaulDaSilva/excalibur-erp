@@ -19,6 +19,20 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function getFieldMessageFromRecord(record: Record<string, unknown>, fieldPath: string): string | undefined {
+  const segments = fieldPath.split(".");
+  let current: unknown = record;
+
+  for (const segment of segments) {
+    if (!isRecord(current)) {
+      return undefined;
+    }
+    current = current[segment];
+  }
+
+  return parseBackendMessage(current);
+}
+
 export function extractApiValidation<T extends string>(
   error: unknown,
   allowedFields: readonly T[],
@@ -29,7 +43,7 @@ export function extractApiValidation<T extends string>(
 
   if (isRecord(apiError.data)) {
     for (const fieldName of allowedFields) {
-      const message = parseBackendMessage(apiError.data[fieldName]);
+      const message = getFieldMessageFromRecord(apiError.data, fieldName);
       if (message) {
         fieldErrors[fieldName] = message;
       }

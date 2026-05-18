@@ -129,15 +129,11 @@ function shouldShowSupplierName(category: ExpenseCategory | null): boolean {
     return false;
   }
 
-  return category.code === "DELIVERY_RUNS" || category.form_group === "MISCELANEO";
+  return category.code === "DELIVERY_RUNS";
 }
 
-function shouldShowReferenceNumber(category: ExpenseCategory | null): boolean {
-  if (!category) {
-    return false;
-  }
-
-  return category.form_group === "MISCELANEO";
+function shouldShowReferenceNumber(): boolean {
+  return false;
 }
 
 function getDynamicIssues(
@@ -253,7 +249,7 @@ export function GastoForm({ mode, initialData, categories, onSubmit, onCancel }:
     [groupCategories, selectedCategory, selectedGroup],
   );
   const showSupplierName = shouldShowSupplierName(selectedCategory);
-  const showReferenceNumber = shouldShowReferenceNumber(selectedCategory);
+  const showReferenceNumber = shouldShowReferenceNumber();
 
   useEffect(() => {
     reset(defaultValues);
